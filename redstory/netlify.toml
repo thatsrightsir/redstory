@@ -1,4 +1,5 @@
 [build]
+  base = "redstory"
   functions = "netlify/functions"
 
 [functions]
