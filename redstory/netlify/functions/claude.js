@@ -42,12 +42,14 @@ exports.handler = async (event) => {
       role: 'user',
       content: `You are a wine encyclopedia. The user typed: "${query.trim()}"
 
-Identify the most likely wine this refers to and return ONLY a valid JSON object — no markdown, no backticks, no explanation.
+Identify the most likely wine this refers to. Be generous with partial names, typos, bin numbers and shorthand (e.g. "Bin 8", "Grange", "Cloudy Bay SB", "Marg" for Margaux). Always return your best match — never say you don't know.
+
+Return ONLY a valid JSON object — no markdown, no backticks, no explanation.
 
 Return exactly this structure:
 {
-  "name": "full wine name",
-  "producer": "winery or producer name",
+  "name": "full wine name e.g. Penfolds Bin 8 Cabernet Shiraz",
+  "producer": "winery or producer name e.g. Penfolds",
   "type": "red or white or rose or sparkling or dessert",
   "country": "country of origin",
   "region": "wine region or appellation",
@@ -61,8 +63,8 @@ Return exactly this structure:
 Rules:
 - type must be exactly one of: red, white, rose, sparkling, dessert
 - vintage is null unless the user specified a year
-- If the wine is not well-known, make your best inference based on the name
-- Never return null for name, producer, type, country, region, grape`
+- Always make your best guess — never leave name, producer, type, country, region or grape as null
+- For bin numbers like "Bin 8", "Bin 389", "Bin 407" — these are Penfolds wines, identify them correctly`
     }];
 
   } else if (type === 'label_scan') {
