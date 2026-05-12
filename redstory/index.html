@@ -1599,7 +1599,7 @@ function resetAddForm(){
   buildAddStars();
 }
 function changeAddQty(d){addQty=Math.max(1,addQty+d);document.getElementById('add-qty-display').textContent=addQty;}
-let addPhotoData=null,scanAborted=false;
+let addPhotoData=null,scanAborted=false,lastSearchResult=null;
 function handlePhoto(input){
   const file=input.files[0];if(!file)return;
   const r=new FileReader();
@@ -1676,7 +1676,7 @@ function cancelScan(){scanAborted=true;document.getElementById('scan-overlay').c
 // ══════════════════════════════════════════
 // WINE SEARCH — Claude-powered lookup
 // ══════════════════════════════════════════
-let searchTimer=null, lastSearchResult=null;
+let searchTimer=null;
 
 function handleWineSearch(val){
   clearTimeout(searchTimer);
