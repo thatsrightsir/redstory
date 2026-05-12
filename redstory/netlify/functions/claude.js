@@ -105,7 +105,7 @@ Rules: vintage is a number or null. type must be one of the five options. Use nu
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-5',
         max_tokens,
         messages,
       }),
