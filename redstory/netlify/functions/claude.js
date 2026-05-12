@@ -10,10 +10,9 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: 'Method not allowed' };
   }
 
-  // Basic rate limiting check via headers
+  // Allow requests from any netlify.app subdomain or localhost
   const origin = event.headers.origin || '';
-  const allowed = ['https://redstory.netlify.app', 'http://localhost'];
-  const isAllowed = allowed.some(o => origin.startsWith(o));
+  const isAllowed = !origin || origin.includes('netlify.app') || origin.includes('localhost') || origin.includes('redcellar');
   if (!isAllowed) {
     return { statusCode: 403, body: 'Forbidden' };
   }

@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>My Cellar</title>
+<title>Red Cellar</title>
 <meta name="description" content="Your personal wine journal"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="My Cellar"/>
+<meta name="apple-mobile-web-app-title" content="Red Cellar"/>
 <meta name="theme-color" content="#1a0d05"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icon.png"/>
@@ -683,7 +683,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
     <div class="login-logo">
       <div style="font-size:72px;line-height:1;filter:drop-shadow(0 4px 28px rgba(100,150,255,0.5));margin-bottom:4px;">🍷</div>
     </div>
-    <div class="login-title">My Cellar</div>
+    <div class="login-title">Red Cellar</div>
     <div class="login-sub">Your personal wine journal</div>
 
     <!-- Sign in form -->
@@ -804,7 +804,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
       <div class="settings-section-title">ℹ️ About</div>
       <div class="settings-card">
         <div class="settings-row">
-          <div class="settings-row-left"><div class="settings-row-key">My Cellar</div><div class="settings-row-sub">Your personal wine journal</div></div>
+          <div class="settings-row-left"><div class="settings-row-key">Red Cellar</div><div class="settings-row-sub">Your personal wine journal</div></div>
           <div class="settings-row-val">v1.0</div>
         </div>
         <div class="settings-row">
@@ -822,7 +822,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
       </div>
     </div>
 
-    <div class="version-footer">Made with 🍷 · My Cellar 1.0</div>
+    <div class="version-footer">Made with 🍷 · Red Cellar 1.0</div>
   </div>
   <div class="bnav">
     <button class="ni" onclick="setNav(0)"><span class="ni-icon">🍾</span><span class="ni-lbl">Cellar</span></button>
@@ -860,7 +860,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
   <div class="statusbar"><span class="sb-time" id="clock1">9:41</span><div class="sb-icons"><span>▲▲▲</span><span>WiFi</span><span>🔋</span></div></div>
   <div class="cellar-header">
     <div class="cellar-title-row">
-      <div><div class="cellar-title">My Cellar</div><div class="cellar-sub">Personal wine journal</div></div>
+      <div><div class="cellar-title">Red Cellar</div><div class="cellar-sub">Personal wine journal</div></div>
       <div class="header-actions" style="flex-direction:column;align-items:flex-end;gap:6px;">
         <div class="user-pill" id="user-pill" onclick="setNav(3)">
           <div class="user-avatar" id="user-avatar">?</div>
@@ -1403,7 +1403,7 @@ function exportData(){
   const blob=new Blob([data],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=url;a.download='my-cellar-backup.json';a.click();
+  a.href=url;a.download='red-cellar-backup.json';a.click();
   URL.revokeObjectURL(url);
   showToast('Data exported!');
 }
@@ -1930,7 +1930,7 @@ function detailChangeQty(delta){
 }
 function shareWine(){
   const w=wines.find(x=>x.id===currentDetailId);if(!w)return;
-  const text='🍷 '+w.name+(w.vintage?' ('+w.vintage+')':'')+'\n'+(w.region?w.region+', ':'')+(w.country||'')+'\nRating: '+(w.rating||'unrated')+'/5\nFrom My Cellar';
+  const text='🍷 '+w.name+(w.vintage?' ('+w.vintage+')':'')+'\n'+(w.region?w.region+', ':'')+(w.country||'')+'\nRating: '+(w.rating||'unrated')+'/5\nFrom Red Cellar';
   if(navigator.share){navigator.share({title:w.name,text}).catch(()=>{});}
   else if(navigator.clipboard){navigator.clipboard.writeText(text).then(()=>showToast('Copied to clipboard!'));}
   else showToast('Share not supported on this device');
