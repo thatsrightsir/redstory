@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>Red Cellar</title>
-<meta name="description" content="Your personal wine journal"/>
+<meta name="description" content="A private collection, yours alone"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Red Cellar"/>
@@ -18,31 +18,16 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden}
 :root{
-  /* Classic Cellar (default) */
-  --bg:#1a0d05;--bg2:#231108;--card:#fdf7ef;--card2:#f4ead8;--parch:#f2e8d9;
-  --ink:#1e120a;--ink2:#5c3d28;--ink3:#9c7a60;--ink4:#c4a98a;
-  --amber:#b8712a;--amber2:#d4924a;--amber3:#f0c070;--wine:#7c2230;--teal:#2a6b5a;
-  --border:rgba(120,80,40,0.13);--border2:rgba(120,80,40,0.25);
-  --nav-bg:rgba(18,7,2,0.97);--status-bg:#1a0d05;
+  /* Red Cellar — Navy, Brown, White */
+  --bg:#0d1117;--bg2:#111827;--card:#f8f4ee;--card2:#ede6d8;--parch:#f4f0e8;
+  --ink:#2c1810;--ink2:#4a2e1a;--ink3:#9c7a60;--ink4:#c4a98a;
+  --amber:#8b5e3c;--amber2:#c4956a;--amber3:#e8d5b7;--wine:#7c2230;--teal:#2a5040;
+  --border:rgba(100,70,40,0.12);--border2:rgba(100,70,40,0.22);
+  --nav-bg:rgba(8,10,18,0.98);--status-bg:#0d1117;
   --serif:'Cormorant Garamond',Georgia,serif;--sans:'Jost',system-ui,sans-serif;
   --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
 }
-/* ── LAKE TEKAPO — midnight alpine lake, stars, aurora ── */
-[data-theme="tekapo"]{
-  --bg:#0a0e1a;--bg2:#0d1220;--card:#f0f4ff;--card2:#e4eaf8;--parch:#edf1ff;
-  --ink:#0a0e20;--ink2:#1e2a4a;--ink3:#5a6a9a;--ink4:#9aaac8;
-  --amber:#7c9fe0;--amber2:#a0bef0;--amber3:#c8dcff;--wine:#4a2060;--teal:#2a6080;
-  --border:rgba(80,100,160,0.14);--border2:rgba(80,100,160,0.28);
-  --nav-bg:rgba(6,8,18,0.97);--status-bg:#0a0e1a;
-}
-/* ── ZERMATT MORNING — crisp alps dawn, golden mist ── */
-[data-theme="zermatt"]{
-  --bg:#f5f0e8;--bg2:#ede7da;--card:#ffffff;--card2:#f8f3ec;--parch:#fdfaf5;
-  --ink:#1a1410;--ink2:#3d3020;--ink3:#7a6550;--ink4:#b0987a;
-  --amber:#c07828;--amber2:#d8922e;--amber3:#f0b840;--wine:#7a2020;--teal:#2a5040;
-  --border:rgba(100,70,30,0.12);--border2:rgba(100,70,30,0.22);
-  --nav-bg:rgba(240,234,224,0.97);--status-bg:#f5f0e8;
-}
+/* Single theme: Red Cellar Navy */
 body{font-family:var(--sans);background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;height:100%;position:relative;transition:background 0.6s ease,color 0.6s ease;}
 /* Wallpaper layer — rendered as pure CSS art behind everything */
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:1;transition:opacity 0.8s ease;}
@@ -161,9 +146,15 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
 .ni.on .ni-lbl{color:var(--amber2);}
 
 /* SHARED */
-.icon-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.13);color:var(--amber2);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.15s;}
-.icon-btn:active{background:rgba(255,255,255,0.16);}
-.back-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.13);color:var(--amber2);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.icon-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.10);color:var(--amber2);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.15s;}
+.icon-btn:active{background:rgba(255,255,255,0.12);}
+.back-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.10);color:var(--amber2);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.gear-bare{background:none;border:none;font-size:15px;color:rgba(196,149,106,0.45);cursor:pointer;padding:4px;line-height:1;transition:color 0.15s;margin-top:6px;}
+.gear-bare:active{color:var(--amber2);}
+/* Beautiful add fab */
+.add-fab-beautiful{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--amber);border-radius:50px;padding:13px 36px;margin:14px auto 16px;cursor:pointer;box-shadow:0 4px 20px rgba(139,94,60,0.35);transition:all 0.2s;}
+.add-fab-beautiful:active{transform:scale(0.97);}
+.add-fab-beautiful-txt{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--amber3);}
 .scrollable{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .scrollable::-webkit-scrollbar{width:3px;}
 .scrollable::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
@@ -684,7 +675,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
       <div style="font-size:72px;line-height:1;filter:drop-shadow(0 4px 28px rgba(100,150,255,0.5));margin-bottom:4px;">🍷</div>
     </div>
     <div class="login-title">Red Cellar</div>
-    <div class="login-sub">Your personal wine journal</div>
+    <div class="login-sub">A private collection, yours alone</div>
 
     <!-- Sign in form -->
     <div id="login-form-wrap">
@@ -697,12 +688,12 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
         <label class="login-lbl" for="login-pw">Password</label>
         <input class="login-input" id="login-pw" type="password" placeholder="Your password" autocomplete="current-password"/>
       </div>
-      <button class="login-btn" id="login-btn" onclick="handleLogin()">Sign in</button>
+      <button class="login-btn" id="login-btn" onclick="handleLogin()">Enter my cellar</button>
       <div class="login-toggle" id="login-toggle-txt">
-        No account yet? <a onclick="toggleLoginMode()">Create one</a>
+        New here? <a onclick="toggleLoginMode()">Claim your cellar</a>
       </div>
       <div class="login-magic">
-        <a onclick="sendMagicLink()">Sign in by email link instead →</a>
+        <a onclick="sendMagicLink()">Send me an entry link instead →</a>
       </div>
     </div>
 
@@ -720,7 +711,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
   <div class="settings-scroll">
     <div class="settings-hero">
       <div class="settings-hero-title">Settings</div>
-      <div class="settings-hero-sub">Personalise your cellar</div>
+      <div class="settings-hero-sub">The house rules</div>
     </div>
 
     <!-- Theme picker -->
@@ -804,12 +795,12 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
       <div class="settings-section-title">ℹ️ About</div>
       <div class="settings-card">
         <div class="settings-row">
-          <div class="settings-row-left"><div class="settings-row-key">Red Cellar</div><div class="settings-row-sub">Your personal wine journal</div></div>
+          <div class="settings-row-left"><div class="settings-row-key">Red Cellar</div><div class="settings-row-sub">A private collection, yours alone</div></div>
           <div class="settings-row-val">v1.0</div>
         </div>
         <div class="settings-row">
-          <div class="settings-row-left"><div class="settings-row-key">Data storage</div><div class="settings-row-sub">Saved locally on this device</div></div>
-          <div class="settings-row-val" style="font-size:11px;color:var(--teal);">On device</div>
+          <div class="settings-row-left"><div class="settings-row-key">Data storage</div><div class="settings-row-sub">Encrypted in the cloud</div></div>
+          <div class="settings-row-val" style="font-size:11px;color:var(--teal);">Secured ✦</div>
         </div>
         <div class="settings-row" style="cursor:pointer;" onclick="exportData()">
           <div class="settings-row-left"><div class="settings-row-key">Export my data</div><div class="settings-row-sub">Download all wines as JSON</div></div>
@@ -826,9 +817,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
   </div>
   <div class="bnav">
     <button class="ni" onclick="setNav(0)"><span class="ni-icon">🍾</span><span class="ni-lbl">Cellar</span></button>
-    <button class="ni" onclick="setNav(1)"><span class="ni-icon">🌙</span><span class="ni-lbl">Tonight</span></button>
-    <button class="ni" onclick="openAddScreen()"><span class="ni-icon">＋</span><span class="ni-lbl">Add</span></button>
-    <button class="ni on"><span class="ni-icon">⚙️</span><span class="ni-lbl">Settings</span></button>
+    <button class="ni" onclick="setNav(1)"><span class="ni-icon">🌙</span><span class="ni-lbl">For the Night</span></button>
   </div>
 </div>
 <!-- Scan overlay -->
@@ -860,16 +849,9 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
   <div class="statusbar"><span class="sb-time" id="clock1">9:41</span><div class="sb-icons"><span>▲▲▲</span><span>WiFi</span><span>🔋</span></div></div>
   <div class="cellar-header">
     <div class="cellar-title-row">
-      <div><div class="cellar-title">Red Cellar</div><div class="cellar-sub">Personal wine journal</div></div>
-      <div class="header-actions" style="flex-direction:column;align-items:flex-end;gap:6px;">
-        <div class="user-pill" id="user-pill" onclick="setNav(3)">
-          <div class="user-avatar" id="user-avatar">?</div>
-          <div class="user-email" id="user-email-display">loading…</div>
-        </div>
-        <div style="display:flex;gap:8px;">
-          <button class="icon-btn" onclick="cycleSortMode()">↕</button>
-          <button class="icon-btn add-fab" onclick="openAddScreen()">+</button>
-        </div>
+      <div><div class="cellar-title">Red Cellar</div><div class="cellar-sub">Your personal collection</div></div>
+      <div class="header-actions">
+        <button class="gear-bare" onclick="openSettings()">⚙</button>
       </div>
     </div>
   </div>
@@ -885,18 +867,21 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
     <button class="fpill" data-filter="rose">Rosé</button>
     <button class="fpill" data-filter="sparkling">Sparkling</button>
     <button class="fpill" data-filter="dessert">Dessert</button>
-    <button class="fpill" data-filter="consumed">Consumed</button>
+    <button class="fpill" data-filter="consumed">Happily consumed</button>
+    <button class="fpill" id="sort-pill" onclick="cycleSortMode()" style="border-color:rgba(196,149,106,0.3);color:rgba(196,149,106,0.7);">Newest ↓</button>
   </div>
   <div class="search-wrap"><div class="search-inner"><span class="search-icon">🔍</span><input class="search-bar" type="search" placeholder="Search wine, producer, country…" id="search-input" autocomplete="off"/></div></div>
   <div class="wine-list-wrap">
-    <div class="list-header"><span class="list-count" id="list-count">Loading…</span><button class="sort-btn" id="sort-lbl" onclick="cycleSortMode()">Newest first ↓</button></div>
+    <div class="list-header"><span class="list-count" id="list-count">Loading…</span></div>
     <div class="wine-list" id="wine-list"></div>
+    <div class="add-fab-beautiful" onclick="openAddScreen()">
+      <span style="font-size:20px;color:var(--amber3);font-weight:300;">＋</span>
+      <span class="add-fab-beautiful-txt">Uncork a new entry</span>
+    </div>
   </div>
   <div class="bnav">
     <button class="ni on" onclick="setNav(0)"><span class="ni-icon">🍾</span><span class="ni-lbl">Cellar</span></button>
-    <button class="ni" onclick="setNav(1)"><span class="ni-icon">🌙</span><span class="ni-lbl">Tonight</span></button>
-    <button class="ni" onclick="openAddScreen()"><span class="ni-icon">＋</span><span class="ni-lbl">Add</span></button>
-    <button class="ni" onclick="setNav(3)"><span class="ni-icon">⚙️</span><span class="ni-lbl">Settings</span></button>
+    <button class="ni" onclick="setNav(1)"><span class="ni-icon" id="tonight-nav-icon">🌙</span><span class="ni-lbl" id="tonight-nav-lbl">For the Night</span></button>
   </div>
 </div>
 
@@ -905,25 +890,25 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
   <div class="statusbar"><span class="sb-time" id="clock2">9:41</span><div class="sb-icons"><span>▲▲▲</span><span>WiFi</span><span>🔋</span></div></div>
   <div class="add-topbar">
     <button class="back-btn" onclick="goBack()">←</button>
-    <div><div class="add-title">Add a wine</div><div class="add-sub">Fill in what you know</div></div>
+    <div><div class="add-title">Uncork a new entry</div><div class="add-sub">Name it and we'll do the rest</div></div>
   </div>
   <div class="form-scroll" id="add-form-scroll">
 
     <!-- ── Wine Search ── -->
     <div class="wine-search-wrap">
       <input class="wine-search-input" id="wine-search-input" type="text"
-        placeholder="Start typing a wine name…" autocomplete="off"
+        placeholder="What shall we call this one?" autocomplete="off"
         oninput="handleWineSearch(this.value)"/>
       <div class="wine-search-spinner" id="wine-search-spinner"></div>
     </div>
     <div class="wine-search-hint">
-      <span>✦</span> Type any wine name — we'll look it up instantly
+      <span>✦</span> Name it and we'll find it in our records
     </div>
 
     <!-- Search result card -->
     <div class="wine-result-card" id="wine-result-card">
       <div class="wine-result-header">
-        <div class="wine-result-badge">✦ Found a match</div>
+        <div class="wine-result-badge">✦ Found in our records</div>
         <div class="wine-result-name" id="wr-name"></div>
         <div class="wine-result-producer" id="wr-producer"></div>
         <div class="wine-result-pills" id="wr-pills"></div>
@@ -937,10 +922,10 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
         </div>
         <div class="wine-result-flavours" id="wr-flavours"></div>
         <button class="wine-result-confirm" onclick="confirmWineResult()">
-          <span>＋</span> Add this wine to my cellar
+          <span>＋</span> Lay it down
         </button>
         <div class="wine-result-manual">
-          Not quite right? <a onclick="editWineResult()">Edit details</a> or <a onclick="clearWineSearch()">search again</a>
+          Not quite right? <a onclick="editWineResult()">Amend the details</a> or <a onclick="clearWineSearch()">search again</a>
         </div>
       </div>
     </div>
@@ -968,18 +953,18 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
       <div class="section-title"><span>🍾</span> About this wine</div>
       <div class="field"><div class="flbl">Wine name & producer</div><input class="finput" id="f-name" type="text" placeholder="e.g. Château Margaux" autocomplete="off"/></div>
       <div class="field-row">
-        <div class="field"><div class="flbl">Vintage year</div><input class="finput" id="f-vintage" type="number" placeholder="e.g. 2019" inputmode="numeric"/></div>
-        <div class="field"><div class="flbl">Wine type</div><select class="fselect" id="f-type"><option value="">Select…</option><option value="red">Red</option><option value="white">White</option><option value="rose">Rosé</option><option value="sparkling">Sparkling</option><option value="dessert">Dessert</option></select></div>
+        <div class="field"><div class="flbl">The year it was born</div><input class="finput" id="f-vintage" type="number" placeholder="e.g. 2019" inputmode="numeric"/></div>
+        <div class="field"><div class="flbl">Style of wine</div><select class="fselect" id="f-type"><option value="">Select…</option><option value="red">Red</option><option value="white">White</option><option value="rose">Rosé</option><option value="sparkling">Sparkling</option><option value="dessert">Dessert</option></select></div>
       </div>
       <div class="field"><div class="flbl">Country</div><input class="finput" id="f-country" type="text" placeholder="e.g. France" autocomplete="off"/></div>
       <div class="field"><div class="flbl">Region</div><input class="finput" id="f-region" type="text" placeholder="e.g. Bordeaux" autocomplete="off"/></div>
       <div class="field-row">
-        <div class="field"><div class="flbl">Price paid (RM)</div><input class="finput" id="f-price" type="number" placeholder="e.g. 150" inputmode="decimal"/></div>
-        <div class="field"><div class="flbl">Bottles owned</div><div style="display:flex;align-items:center;gap:8px;padding-top:4px;"><button class="qty-big-btn" onclick="changeAddQty(-1)" style="width:32px;height:32px;font-size:18px;">−</button><span class="qty-big-num" id="add-qty-display" style="font-size:24px;padding:0 8px;">1</span><button class="qty-big-btn" onclick="changeAddQty(1)" style="width:32px;height:32px;font-size:18px;">+</button></div></div>
+        <div class="field"><div class="flbl">What did you pay? (RM)</div><input class="finput" id="f-price" type="number" placeholder="e.g. 150" inputmode="decimal"/></div>
+        <div class="field"><div class="flbl">How many did you acquire?</div><div style="display:flex;align-items:center;gap:8px;padding-top:4px;"><button class="qty-big-btn" onclick="changeAddQty(-1)" style="width:32px;height:32px;font-size:18px;">−</button><span class="qty-big-num" id="add-qty-display" style="font-size:24px;padding:0 8px;">1</span><button class="qty-big-btn" onclick="changeAddQty(1)" style="width:32px;height:32px;font-size:18px;">+</button></div></div>
       </div>
     </div>
     <div class="form-section">
-      <div class="section-title"><span>🍇</span> Grape variety</div>
+      <div class="section-title"><span>🍇</span> The grape</div>
       <div class="grape-scroll" id="grape-scroll">
         <div class="grape-chip" data-grape="Cabernet Sauvignon" onclick="pickGrape(this)">Cabernet Sauvignon</div>
         <div class="grape-chip" data-grape="Merlot" onclick="pickGrape(this)">Merlot</div>
@@ -998,7 +983,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
       </div>
     </div>
     <div class="form-section">
-      <div class="section-title"><span>👅</span> Flavour profile</div>
+      <div class="section-title"><span>👅</span> What the nose and palate find</div>
       <div class="suggest-banner" id="suggest-banner">Suggested for <strong id="suggest-grape-name"></strong> — tap to deselect any that don't fit</div>
       <div class="ftags-wrap" id="flavour-suggested"></div>
       <div style="padding:0 16px 14px;"><button class="ftag-more" onclick="toggleAllFlavours()"><span id="more-icon">＋</span> <span id="more-txt">Add more flavours</span></button></div>
@@ -1007,7 +992,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
       <div id="no-flavour-msg" style="padding:14px 16px;font-size:12px;color:var(--ink3);font-style:italic;">Choose a grape above to get suggested flavours</div>
     </div>
     <div class="form-section">
-      <div class="section-title"><span>🍽️</span> Food pairing</div>
+      <div class="section-title"><span>🍽️</span> It drinks well with</div>
       <div class="suggest-banner" id="food-suggest-banner">Suggested for <strong id="food-suggest-grape"></strong></div>
       <div class="ftags-wrap" id="food-suggested"></div>
       <div style="padding:0 16px 14px;"><button class="ftag-more" onclick="toggleAllFood()"><span id="food-more-icon">＋</span> <span id="food-more-txt">Add more pairings</span></button></div>
@@ -1016,17 +1001,17 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
       <div id="no-food-msg" style="padding:14px 16px;font-size:12px;color:var(--ink3);font-style:italic;">Choose a grape above to get suggested pairings</div>
     </div>
     <div class="form-section">
-      <div class="section-title"><span>⭐</span> Your rating <span style="font-size:9px;font-weight:300;color:var(--ink4);margin-left:4px;">tap once = full · tap again = half</span></div>
+      <div class="section-title"><span>⭐</span> How did it treat you? <span style="font-size:9px;font-weight:300;color:var(--ink4);margin-left:4px;">once for full · again for half</span></div>
       <div class="star-row" id="star-row-add"></div>
-      <div style="padding:0 16px 13px;font-size:12px;color:var(--ink3);" id="rating-lbl-add">Tap a star to rate</div>
+      <div style="padding:0 16px 13px;font-size:12px;color:var(--ink3);" id="rating-lbl-add">How did it treat you?</div>
     </div>
     <div class="form-section" style="margin-bottom:0;">
-      <div class="section-title"><span>📝</span> Notes <span style="font-size:9px;font-weight:300;color:var(--ink4);margin-left:4px;">optional</span></div>
-      <div class="field" style="border-bottom:none;"><textarea class="notes-input" id="f-notes" placeholder="Tasting notes, occasion, who you shared it with…" rows="3"></textarea></div>
+      <div class="section-title"><span>📝</span> A passing thought <span style="font-size:9px;font-weight:300;color:var(--ink4);margin-left:4px;">if the moment calls for it</span></div>
+      <div class="field" style="border-bottom:none;"><textarea class="notes-input" id="f-notes" placeholder="The occasion, the company, the verdict…" rows="3"></textarea></div>
     </div>
     <div style="height:16px;"></div>
   </div>
-  <div class="save-bar"><button class="save-btn" onclick="saveWine()"><span>🍾</span> Save to my cellar</button></div>
+  <div class="save-bar"><button class="save-btn" onclick="saveWine()"><span>🍾</span> Commit to the cellar</button></div>
 </div>
 
 <!-- SCREEN 3: BOTTLE DETAIL -->
@@ -1037,7 +1022,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
       <button class="back-btn" onclick="goBack()">←</button>
       <div class="hero-actions">
         <button class="icon-btn" onclick="shareWine()" title="Share">↗</button>
-        <button class="icon-btn" onclick="showToast('Edit feature coming soon!')" title="Edit">✏</button>
+        <button class="icon-btn" onclick="editWine()" title="Amend">✏</button>
       </div>
     </div>
     <div class="hero-content">
@@ -1057,12 +1042,12 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
   </div>
   <div class="scrollable parch-bg" id="detail-scroll">
     <div class="qty-card" id="d-qty-card">
-      <div class="qty-left"><div class="qty-lbl">Bottles in cellar</div><div class="qty-big" id="d-qty-num">3</div><div class="qty-unit">bottles remaining</div></div>
+      <div class="qty-left"><div class="qty-lbl">Resting in your cellar</div><div class="qty-big" id="d-qty-num">3</div><div class="qty-unit">bottles acquired</div></div>
       <div class="qty-ctrls"><button class="qty-ctrl-btn plus" onclick="detailChangeQty(1)">+</button><button class="qty-ctrl-btn minus" onclick="detailChangeQty(-1)">−</button></div>
     </div>
-    <div class="low-stock-warn" id="low-stock-warn"><span>⚠️</span><span>Only <strong id="low-stock-n">1</strong> bottle left — consider restocking</span></div>
+    <div class="low-stock-warn" id="low-stock-warn"><span>⚠️</span><span>Only <strong id="low-stock-n">1</strong> bottle remains — perhaps time to restock</span></div>
     <div class="info-card">
-      <div class="info-card-title"><span>🍾</span> Wine details</div>
+      <div class="info-card-title"><span>🍾</span> About this bottle</div>
       <div class="info-row"><span class="info-key">Grape</span><span class="info-val" id="d-grape">—</span></div>
       <div class="info-row"><span class="info-key">Country</span><span class="info-val" id="d-country">—</span></div>
       <div class="info-row"><span class="info-key">Region</span><span class="info-val" id="d-region">—</span></div>
@@ -1070,12 +1055,12 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
       <div class="info-row"><span class="info-key">Price paid</span><span class="info-val price-val" id="d-price">—</span></div>
       <div class="info-row"><span class="info-key">Added</span><span class="info-val" id="d-added">—</span></div>
     </div>
-    <div class="info-card"><div class="info-card-title"><span>👅</span> Flavour profile</div><div class="ftags-wrap" id="d-flavours"></div></div>
-    <div class="info-card"><div class="info-card-title"><span>🍽️</span> Food pairings</div><div class="ftags-wrap" id="d-pairings"></div></div>
-    <div class="info-card"><div class="info-card-title"><span>📝</span> My notes</div><div id="d-notes-wrap"></div></div>
+    <div class="info-card"><div class="info-card-title"><span>👅</span> What the nose and palate find</div><div class="ftags-wrap" id="d-flavours"></div></div>
+    <div class="info-card"><div class="info-card-title"><span>🍽️</span> It drinks well with</div><div class="ftags-wrap" id="d-pairings"></div></div>
+    <div class="info-card"><div class="info-card-title"><span>📝</span> My account of it</div><div id="d-notes-wrap"></div></div>
     <!-- Tasting Log -->
     <div class="info-card" style="margin-bottom:0;">
-      <div class="info-card-title"><span>🗓️</span> Log a tasting</div>
+      <div class="info-card-title"><span>🗓️</span> Record an occasion</div>
       <div class="log-toggle-wrap">
         <div class="log-toggle">
           <button class="log-opt on" id="log-quick-btn" onclick="setLogMode('quick')"><span>⚡</span> Quick sip</button>
@@ -1083,22 +1068,22 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
         </div>
       </div>
       <div style="border-top:0.5px solid var(--border);">
-        <div class="field"><div class="flbl">Date opened</div><input class="finput" id="t-date" type="date"/></div>
+        <div class="field"><div class="flbl">The date of the occasion</div><input class="finput" id="t-date" type="date"/></div>
         <div class="field" id="t-occasion-wrap" style="display:none;"><div class="flbl">Occasion</div><input class="finput" id="t-occasion" type="text" placeholder="e.g. Anniversary dinner"/></div>
         <div class="field" id="t-with-wrap" style="display:none;"><div class="flbl">Shared with</div><input class="finput" id="t-with" type="text" placeholder="e.g. Sarah & James"/></div>
         <div class="field" id="t-food-wrap" style="display:none;"><div class="flbl">Paired with</div><input class="finput" id="t-food" type="text" placeholder="e.g. Dry-aged ribeye"/></div>
-        <div class="field"><div class="flbl">Quick note</div><input class="finput" id="t-note" type="text" placeholder="How was it tonight?"/></div>
-        <div class="field" style="border-bottom:none;"><div class="flbl">Rating this bottle</div><div class="star-row" id="star-row-tasting" style="padding:6px 0 0;"></div></div>
+        <div class="field"><div class="flbl">Your verdict</div><input class="finput" id="t-note" type="text" placeholder="How did it present itself?"/></div>
+        <div class="field" style="border-bottom:none;"><div class="flbl">How did it treat you?</div><div class="star-row" id="star-row-tasting" style="padding:6px 0 0;"></div></div>
       </div>
-      <div style="padding:12px 16px;"><button class="save-btn" style="font-size:16px;padding:13px;" onclick="saveTasting()"><span>🍷</span> Log this tasting</button></div>
+      <div style="padding:12px 16px;"><button class="save-btn" style="font-size:16px;padding:13px;" onclick="saveTasting()"><span>🍷</span> Record the occasion</button></div>
     </div>
     <div style="margin:14px 16px 0;">
-      <div style="font-size:9px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink3);padding:0 0 10px;display:flex;align-items:center;gap:8px;"><span>📚</span> Tasting history</div>
+      <div style="font-size:9px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink3);padding:0 0 10px;display:flex;align-items:center;gap:8px;"><span>📚</span> The record of occasions</div>
       <div id="tasting-history-list"></div>
     </div>
     <div class="action-grid">
-      <button class="act-btn" onclick="shareWine()"><span class="act-btn-icon">↗️</span><span>Share wine</span></button>
-      <button class="act-btn danger" onclick="openDeleteModal()"><span class="act-btn-icon">🗑️</span><span>Remove wine</span></button>
+      <button class="act-btn" onclick="shareWine()"><span class="act-btn-icon">↗️</span><span>Share this bottle</span></button>
+      <button class="act-btn danger" onclick="openDeleteModal()"><span class="act-btn-icon">🕯️</span><span>Retire this bottle</span></button>
     </div>
     <div class="scroll-end"></div>
   </div>
@@ -1110,7 +1095,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
   <div class="tonight-header">
     <div class="step-progress" id="step-progress"></div>
     <div class="step-q" id="step-q">What's your <em>mood</em>?</div>
-    <div class="step-hint" id="step-hint">Based on what's in your cellar right now</div>
+    <div class="step-hint" id="step-hint">From what's resting in your cellar right now</div>
   </div>
   <div class="bubble-canvas" id="bubble-canvas"></div>
   <div class="tonight-action-bar">
@@ -1122,9 +1107,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
   </div>
   <div class="bnav">
     <button class="ni" onclick="setNav(0)"><span class="ni-icon">🍾</span><span class="ni-lbl">Cellar</span></button>
-    <button class="ni on"><span class="ni-icon">🌙</span><span class="ni-lbl">Tonight</span></button>
-    <button class="ni" onclick="openAddScreen()"><span class="ni-icon">＋</span><span class="ni-lbl">Add</span></button>
-    <button class="ni" onclick="setNav(3)"><span class="ni-icon">⚙️</span><span class="ni-lbl">Settings</span></button>
+    <button class="ni on"><span class="ni-icon" id="tonight-nav-icon2">🌙</span><span class="ni-lbl" id="tonight-nav-lbl2">For the Night</span></button>
   </div>
   <div class="results-overlay" id="results-overlay">
     <div class="res-topbar">
@@ -1172,10 +1155,10 @@ function toggleLoginMode(){
   const tog = document.getElementById('login-toggle-txt');
   if(loginMode==='signup'){
     btn.textContent='Create account';
-    tog.innerHTML='Already have an account? <a onclick="toggleLoginMode()">Sign in</a>';
+    tog.innerHTML='Already have an account? <a onclick="toggleLoginMode()">Enter my cellar</a>';
   } else {
     btn.textContent='Sign in';
-    tog.innerHTML='No account yet? <a onclick="toggleLoginMode()">Create one</a>';
+    tog.innerHTML='New here? <a onclick="toggleLoginMode()">Claim your cellar</a>';
   }
 }
 
@@ -1192,7 +1175,7 @@ async function handleLogin(){
   if(!pw){showLoginError('Please enter your password');return;}
   clearLoginError();
   const btn=document.getElementById('login-btn');
-  btn.disabled=true; btn.textContent='Please wait…';
+  btn.disabled=true; btn.textContent='A moment…';
   try{
     let result;
     if(loginMode==='signup'){
@@ -1380,6 +1363,18 @@ function initTheme(){
     if(el)el.classList.toggle('on',t===currentTheme);
   });
 }
+function updateTonightNavLabel(){
+  const hour=new Date().getHours();
+  const isNight=hour>=16||hour<6;
+  const icon=isNight?'🌙':'☀️';
+  const lbl=isNight?'For the Night':'For the Day';
+  ['tonight-nav-icon','tonight-nav-icon2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=icon;});
+  ['tonight-nav-lbl','tonight-nav-lbl2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=lbl;});
+}
+function openSettings(){
+  showScreen('s-settings',true);
+  renderSettings();
+}
 
 function renderSettings(){
   const active=wines.filter(w=>!w.consumed&&w.qty>0);
@@ -1399,13 +1394,32 @@ async function handleSignOut(){
 }
 
 function exportData(){
-  const data=JSON.stringify({wines,tastings,user:currentUser?.email,exported:new Date().toISOString()},null,2);
-  const blob=new Blob([data],{type:'application/json'});
+  const active=wines.filter(w=>!w.consumed&&w.qty>0).sort((a,b)=>a.name.localeCompare(b.name));
+  const lines=[
+    'RED CELLAR — My Collection',
+    '═'.repeat(40),
+    `Exported: ${new Date().toLocaleDateString('en-MY',{day:'numeric',month:'long',year:'numeric'})}`,
+    `Owner: ${currentUser?.email||'—'}`,
+    '',
+    `No.  Label                          Year   Producer                  Qty`,
+    '─'.repeat(75),
+  ];
+  active.forEach((w,i)=>{
+    const no=(i+1).toString().padEnd(4);
+    const name=(w.name||'—').substring(0,30).padEnd(31);
+    const yr=(w.vintage||'NV').toString().padEnd(7);
+    const prod=(w.producer||'—').substring(0,25).padEnd(26);
+    const qty=w.qty.toString();
+    lines.push(`${no} ${name} ${yr} ${prod} ${qty}`);
+  });
+  lines.push('','─'.repeat(75));
+  lines.push(`Total: ${active.length} wines, ${active.reduce((s,w)=>s+w.qty,0)} bottles`);
+  const blob=new Blob([lines.join('\n')],{type:'text/plain'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=url;a.download='red-cellar-backup.json';a.click();
+  a.href=url;a.download='red-cellar-collection.txt';a.click();
   URL.revokeObjectURL(url);
-  showToast('Data exported!');
+  showToast('Collection exported as text file');
 }
 function openAddScreen(){resetAddForm();showScreen('s-add');}
 function openDetailScreen(id){currentDetailId=id;renderDetail(id);showScreen('s-detail');}
@@ -1472,13 +1486,19 @@ function renderCellar(){
   document.getElementById('s-rating').textContent=avg;
   document.getElementById('list-count').textContent=`${list.length} wine${list.length!==1?'s':''}`;
   const cont=document.getElementById('wine-list');
-  if(!list.length){cont.innerHTML=`<div class="empty-state"><div class="empty-icon">🍷</div><div class="empty-title">Nothing here yet</div><div class="empty-sub">Tap + to add your first wine.</div><button class="empty-cta" onclick="openAddScreen()">+ Add a wine</button></div>`;return;}
+  if(!list.length){cont.innerHTML=`<div class="empty-state"><div class="empty-icon">🍷</div><div class="empty-title">Your cellar awaits its first acquisition</div><div class="empty-sub">Begin your collection below.</div><button class="empty-cta" onclick="openAddScreen()">+ Uncork a new entry</button></div>`;return;}
   cont.innerHTML=list.map((w,i)=>{
     const stripe=TYPE_STRIPE[w.type]||'stripe-red';
     const tags=(w.flavours||[]).slice(0,3).map(f=>tagHtml(f)).join('');
-    const thumbHtml = w.photo && w.photo.startsWith('data')
-      ? `<div class="wcard-thumb"><img src="${w.photo}" alt=""/></div>`
-      : `<div class="wcard-thumb"><div class="wcard-thumb-ph" style="background:${{'red':'#f5e8ea','white':'#faeeda','rose':'#fbeaf0','sparkling':'#e2f0ed','dessert':'#eeedfe'}[w.type]||'#f5e8ea'};">${{'red':'🍷','white':'🥂','rose':'🌸','sparkling':'✨','dessert':'🍯'}[w.type]||'🍷'}</div></div>`;
+    const typeImgs={
+      red:'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=120&q=70',
+      white:'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=120&q=70',
+      rose:'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=120&q=70',
+      sparkling:'https://images.unsplash.com/photo-1547595628-c61a29f496f0?w=120&q=70',
+      dessert:'https://images.unsplash.com/photo-1606312619070-d48b9c7e3d0f?w=120&q=70',
+    };
+    const thumbSrc = w.photo&&w.photo.startsWith('data') ? w.photo : (typeImgs[w.type]||typeImgs.red);
+    const thumbHtml = `<div class="wcard-thumb"><img src="${thumbSrc}" alt="${w.type}" style="width:100%;height:100%;object-fit:cover;"/></div>`;
     return `<div class="wcard" style="animation-delay:${i*0.045}s" onclick="openDetailScreen(${w.id})">
       <div class="wcard-inner">
         ${thumbHtml}
@@ -1501,15 +1521,27 @@ function renderCellar(){
 
 function adjustQty(id,delta){
   const w=wines.find(x=>x.id===id);if(!w)return;
-  w.qty=Math.max(0,w.qty+delta);
-  if(w.qty===0)w.consumed=true;
-  dbUpdateWineQty(id,w.qty,w.consumed);
+  if(delta<0&&w.qty<=1){
+    // Retiring last bottle — confirm first
+    currentDetailId=id;
+    document.getElementById('delete-modal-sub').innerHTML='This will retire <strong>'+w.name+'</strong> from your cellar permanently.';
+    document.getElementById('delete-confirm-btn').onclick=()=>confirmDelete(id);
+    openDeleteModal();
+    return;
+  }
+  w.qty=Math.max(1,w.qty+delta);
+  dbUpdateWineQty(id,w.qty,false);
   const el=document.getElementById('qty-'+id);
-  if(el)el.textContent=w.qty===0?'✓':w.qty;
+  if(el)el.textContent=w.qty;
   const active=wines.filter(x=>!x.consumed&&x.qty>0);
   document.getElementById('s-bottles').textContent=active.reduce((s,x)=>s+x.qty,0);
 }
-function cycleSortMode(){currentSort=(currentSort+1)%sortModes.length;document.getElementById('sort-lbl').textContent=sortModes[currentSort]+' ↓';renderCellar();}
+function cycleSortMode(){
+  currentSort=(currentSort+1)%sortModes.length;
+  const sp=document.getElementById('sort-pill');
+  if(sp)sp.textContent=sortModes[currentSort]+' ↓';
+  renderCellar();
+}
 document.getElementById('filter-row').addEventListener('click',e=>{const b=e.target.closest('.fpill');if(!b)return;document.querySelectorAll('.fpill').forEach(x=>x.classList.remove('on'));b.classList.add('on');currentFilter=b.dataset.filter;renderCellar();});
 document.getElementById('search-input').addEventListener('input',e=>{currentSearch=e.target.value.trim();renderCellar();});
 
@@ -1593,10 +1625,12 @@ function resetAddForm(){
   lastSearchResult=null;
   addPhotoData=null;
   document.getElementById('add-form-scroll').scrollTop=0;
+  editingWineId=null;
+  document.querySelector('#s-add .save-btn').innerHTML='<span>🍾</span> Commit to the cellar';
   buildAddStars();
 }
 function changeAddQty(d){addQty=Math.max(1,addQty+d);document.getElementById('add-qty-display').textContent=addQty;}
-let addPhotoData=null,scanAborted=false,lastSearchResult=null;
+let addPhotoData=null,scanAborted=false,lastSearchResult=null,editingWineId=null;
 function handlePhoto(input){
   const file=input.files[0];if(!file)return;
   const r=new FileReader();
@@ -1774,7 +1808,7 @@ function confirmWineResult(){
   // Hide search card, scroll to form
   document.getElementById('wine-result-card').classList.remove('show');
   document.getElementById('wine-search-input').value='';
-  showToast('Wine details filled in ✦ Review and save');
+  showToast('About this bottle filled in ✦ Review and save');
   setTimeout(()=>document.getElementById('add-form-scroll').scrollTo({top:300,behavior:'smooth'}),200);
 }
 
@@ -1842,13 +1876,43 @@ function buildAddStars(){
 function handleAddStar(i){if(addRating===i)addRating=i-0.5;else if(addRating===i-0.5)addRating=i-1;else addRating=i;updateAddStars();}
 function updateAddStars(){
   document.querySelectorAll('#star-row-add .star-wrap').forEach((w,idx)=>{const n=idx+1;w.dataset.state=addRating>=n?'full':addRating>=n-0.5?'half':'empty';});
-  document.getElementById('rating-lbl-add').textContent=addRating>0?`${addRating} — ${RATING_LABELS[addRating]}`:'Tap a star to rate';
+  document.getElementById('rating-lbl-add').textContent=addRating>0?`${addRating} — ${RATING_LABELS[addRating]}`:'How did it treat you?';
 }
 async function saveWine(){
   const name=document.getElementById('f-name').value.trim();
   if(!name){document.getElementById('f-name').focus();showToast('Please enter a wine name');return;}
   const btn=document.querySelector('#s-add .save-btn');
   if(btn){btn.disabled=true;btn.innerHTML='<span>⏳</span> Saving…';}
+  // If editing existing wine, update it
+  if(editingWineId){
+    try{
+      const updates={
+        name, producer:name,
+        vintage:document.getElementById('f-vintage').value||null,
+        type:document.getElementById('f-type').value||'red',
+        country:document.getElementById('f-country').value.trim(),
+        region:document.getElementById('f-region').value.trim(),
+        price:parseFloat(document.getElementById('f-price').value)||null,
+        qty:addQty, grape:selectedGrape,
+        flavours:[...activeFlavours], pairings:[...activeFoods],
+        rating:addRating,
+        notes:document.getElementById('f-notes').value.trim(),
+        photo:addPhotoData||null,
+      };
+      const{error}=await sb.from('wines').update(updates).eq('id',editingWineId);
+      if(error)throw error;
+      const idx=wines.findIndex(x=>x.id===editingWineId);
+      if(idx>-1)wines[idx]={...wines[idx],...updates};
+      showToast('Changes saved ✦');
+      editingWineId=null;
+      goBack();renderCellar();
+    }catch(e){
+      showToast('Error saving changes');console.error(e);
+    }finally{
+      if(btn){btn.disabled=false;btn.innerHTML='<span>🍾</span> Commit to the cellar';}
+    }
+    return;
+  }
   try{
     const wine=await dbSaveWine({
       name, producer:name,
@@ -1870,7 +1934,7 @@ async function saveWine(){
     showToast('Error saving wine — please try again');
     console.error(e);
   }finally{
-    if(btn){btn.disabled=false;btn.innerHTML='<span>🍾</span> Save to my cellar';}
+    if(btn){btn.disabled=false;btn.innerHTML='<span>🍾</span> Commit to the cellar';}
   }
 }
 
@@ -1993,7 +2057,18 @@ function handleDetailPhoto(input){
 // SCREEN 4 — TONIGHT'S PICK
 // ══════════════════════════════════════════
 const MOOD_MAP={"Fruity":["Red berries","Dark berries","Black cherry","Stone fruit","Citrus","Tropical","Apple & pear","Dried fruit","Jammy"],"Crisp & fresh":["Crisp & clean","Zesty","Fresh & bright","Light-bodied","Grassy","Sea breeze","Herbaceous","Mineral"],"Bold & full":["Full-bodied","Tannic","Velvety","Silky","Jammy"],"Earthy":["Mushroom","Forest floor","Mineral","Herbaceous","Leather"],"Floral":["Rose petal","Violet","Jasmine","Lavender","Orange blossom","Honeysuckle"],"Smoky":["Smoky","Toasty","Charcoal","Meaty","Tobacco","Toasty oak"],"Sweet & rich":["Honey","Caramel","Chocolate","Coffee","Butterscotch","Cream","Toffee","Molasses"],"Spiced":["Black pepper","Cinnamon","Clove","Cedar","Nutmeg","Vanilla"],"Light":["Light-bodied","Fresh & bright","Crisp & clean","Zesty"],"Bubbly":["Bubbly","Crisp & clean","Apple & pear","Cream","Mineral"]};
-const MOOD_EMOJI={"Fruity":"🍒","Crisp & fresh":"🍋","Bold & full":"💪","Earthy":"🍄","Floral":"🌸","Smoky":"🔥","Sweet & rich":"🍫","Spiced":"🌶","Light":"🪶","Bubbly":"✨"};
+const MOOD_EMOJI={
+  "Fruity":"https://images.unsplash.com/photo-1528823872057-9c018575b3b6?w=200&q=80",
+  "Crisp & fresh":"https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=200&q=80",
+  "Bold & full":"https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=200&q=80",
+  "Earthy":"https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=200&q=80",
+  "Floral":"https://images.unsplash.com/photo-1490750967868-88df5691cc45?w=200&q=80",
+  "Smoky":"https://images.unsplash.com/photo-1607434472257-d9f8e57a643d?w=200&q=80",
+  "Sweet & rich":"https://images.unsplash.com/photo-1606312619070-d48b9c7e3d0f?w=200&q=80",
+  "Spiced":"https://images.unsplash.com/photo-1532336414038-cf19250c5757?w=200&q=80",
+  "Light":"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&q=80",
+  "Bubbly":"https://images.unsplash.com/photo-1547595628-c61a29f496f0?w=200&q=80",
+};
 const FOOD_EMOJI={"Steak":"🥩","Lamb":"🍖","Seafood":"🦞","Sushi":"🍣","Pasta":"🍝","Pizza":"🍕","Cheese":"🧀","Charcuterie":"🥓","Dessert":"🍰","Chocolate":"🍫","Dark chocolate":"🍫","Just sipping":"🛋️","BBQ":"🔥","Salads":"🥗","Vegetarian":"🥦","Oysters":"🦪","Goat cheese":"🧀","Picnic":"🧺","Celebrations":"🥳","Tapas":"🫙","Light pasta":"🍝","Pork":"🍖","Chicken":"🍗","Salmon":"🐟","Spicy food":"🌶","Fruit tart":"🥧","Blue cheese":"🧀","Mushroom dishes":"🍄","Risotto":"🍚","Duck":"🍗"};
 const OCC_EMOJI={"Casual night":"😌","Romantic":"❤️","Celebration":"🥳","Dinner party":"🥘","Unwinding":"🛁","As a gift":"🎁"};
 const OCC_TYPE={"Casual night":["white","red","rose"],"Romantic":["red","sparkling","rose"],"Celebration":["sparkling","white","rose"],"Dinner party":["red","white","sparkling"],"Unwinding":["white","red","rose","dessert"],"As a gift":["red","sparkling"]};
@@ -2044,7 +2119,13 @@ function renderTonightStep(){
     const el=document.createElement('div');el.className='bubble'+(isOn?' on':'');
     el.style.cssText=`width:${sz}px;height:${sz}px;left:${pos.x}px;top:${pos.y}px;animation-name:popIn;animation-duration:0.4s;animation-delay:${i*0.055}s;animation-fill-mode:both;animation-timing-function:cubic-bezier(0.34,1.3,0.64,1);`;
     const eSz=Math.round(sz*0.30),lSz=Math.max(9,Math.round(sz*0.115));
-    el.innerHTML=`<span class="b-emoji" style="font-size:${eSz}px;">${cfg.getEmoji(key)}</span><span class="b-label" style="font-size:${lSz}px;padding:0 6px;">${key}</span>`;
+    const imgOrEmoji=cfg.getEmoji(key);
+    const isUrl=imgOrEmoji&&imgOrEmoji.startsWith('http');
+    if(isUrl){
+      el.innerHTML=`<img src="${imgOrEmoji}" alt="${key}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;"/><div style="position:absolute;inset:0;background:rgba(0,0,0,0.32);border-radius:50%;display:flex;align-items:flex-end;justify-content:center;padding-bottom:${Math.round(sz*0.12)}px;"><span class="b-label" style="font-size:${lSz}px;padding:0 4px;">${key}</span></div>`;
+    } else {
+      el.innerHTML=`<span class="b-emoji" style="font-size:${eSz}px;">${imgOrEmoji}</span><span class="b-label" style="font-size:${lSz}px;padding:0 6px;">${key}</span>`;
+    }
     el.addEventListener('animationend',()=>{if(!el.classList.contains('on'))attachFloat(el,i);},{once:true});
     el.addEventListener('click',()=>{
       const group=cfg.id;
@@ -2059,7 +2140,7 @@ function renderTonightStep(){
 function updateTonightBtn(){
   const cfg=TONIGHT_STEPS[tStep],n=(tSel[cfg.id]||[]).length,isLast=tStep===TONIGHT_STEPS.length-1;
   const btn=document.getElementById('tonight-next-btn'),lbl=document.getElementById('tonight-next-lbl'),cnt=document.getElementById('tonight-next-count');
-  if(n>0){btn.className='next-btn next-ready';lbl.textContent=isLast?'Find my bottle 🌙':'Next →';cnt.textContent=n>1?n+' selected':'';}
+  if(n>0){btn.className='next-btn next-ready';lbl.textContent=isLast?'Reveal my bottle 🌙':'Next →';cnt.textContent=n>1?n+' selected':'';}
   else{btn.className='next-btn next-idle';lbl.textContent='Tap a bubble';cnt.textContent='';}
 }
 function tonightNextStep(){if(tStep<TONIGHT_STEPS.length-1){tStep++;renderTonightStep();}else showTonightResults();}
@@ -2100,6 +2181,8 @@ function closeTonightResults(){document.getElementById('results-overlay').classL
 // ══════════════════════════════════════════
 initTheme();
 buildAddStars();
+updateTonightNavLabel();
+setInterval(updateTonightNavLabel, 60000);
 
 // Show loading overlay while checking session
 async function bootApp(){
