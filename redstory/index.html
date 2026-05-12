@@ -398,7 +398,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;o
 .step-q{font-family:var(--serif);font-size:30px;font-weight:600;color:#fff;line-height:1.2;}
 .step-q em{color:var(--amber3);font-style:normal;}
 .step-hint{font-size:11px;color:var(--ink3);margin-top:6px;}
-.bubble-canvas{flex:1;position:relative;z-index:10;overflow:hidden;}
+.bubble-canvas{flex:1;position:relative;z-index:10;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
 .bubble{position:absolute;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-user-select:none;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,0.22) 0%,rgba(255,255,255,0.06) 45%,rgba(0,0,0,0.10) 100%);border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 1px rgba(255,255,255,0.25),inset 0 -1px 2px rgba(0,0,0,0.2),0 6px 24px rgba(0,0,0,0.35),0 2px 6px rgba(0,0,0,0.2);transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.28s ease,background 0.28s ease;will-change:transform;}
 .bubble::before{content:'';position:absolute;width:35%;height:22%;top:14%;left:20%;background:rgba(255,255,255,0.28);border-radius:50%;filter:blur(3px);pointer-events:none;}
 .bubble:active{transform:scale(0.90)!important;transition-duration:0.12s!important;}
@@ -1499,16 +1499,16 @@ function renderCellar(){
     };
     const thumbSrc = w.photo&&w.photo.startsWith('data') ? w.photo : (typeImgs[w.type]||typeImgs.red);
     const thumbHtml = `<div class="wcard-thumb"><img src="${thumbSrc}" alt="${w.type}" style="width:100%;height:100%;object-fit:cover;"/></div>`;
-    return `<div class="wcard" style="animation-delay:${i*0.045}s" onclick="openDetailScreen(${w.id})">
+    return `<div class="wcard" style="animation-delay:${i*0.045}s" onclick="openDetailScreen('${w.id}')">
       <div class="wcard-inner">
         ${thumbHtml}
         <div class="wcard-body">
           <div class="wcard-top">
             <div class="wine-name">${w.name}</div>
             <div class="qty-row" onclick="event.stopPropagation()">
-              <button class="qty-tap" onclick="adjustQty(${w.id},-1)">−</button>
+              <button class="qty-tap" onclick="adjustQty('${w.id}',-1)">−</button>
               <span class="qty-val" id="qty-${w.id}">${w.qty===0?'✓':w.qty}</span>
-              <button class="qty-tap" onclick="adjustQty(${w.id},+1)">+</button>
+              <button class="qty-tap" onclick="adjustQty('${w.id}',+1)">+</button>
             </div>
           </div>
           <div class="wine-sub">${[w.producer,w.region,w.country].filter(Boolean).join(' · ')}</div>
@@ -2058,19 +2058,57 @@ function handleDetailPhoto(input){
 // ══════════════════════════════════════════
 const MOOD_MAP={"Fruity":["Red berries","Dark berries","Black cherry","Stone fruit","Citrus","Tropical","Apple & pear","Dried fruit","Jammy"],"Crisp & fresh":["Crisp & clean","Zesty","Fresh & bright","Light-bodied","Grassy","Sea breeze","Herbaceous","Mineral"],"Bold & full":["Full-bodied","Tannic","Velvety","Silky","Jammy"],"Earthy":["Mushroom","Forest floor","Mineral","Herbaceous","Leather"],"Floral":["Rose petal","Violet","Jasmine","Lavender","Orange blossom","Honeysuckle"],"Smoky":["Smoky","Toasty","Charcoal","Meaty","Tobacco","Toasty oak"],"Sweet & rich":["Honey","Caramel","Chocolate","Coffee","Butterscotch","Cream","Toffee","Molasses"],"Spiced":["Black pepper","Cinnamon","Clove","Cedar","Nutmeg","Vanilla"],"Light":["Light-bodied","Fresh & bright","Crisp & clean","Zesty"],"Bubbly":["Bubbly","Crisp & clean","Apple & pear","Cream","Mineral"]};
 const MOOD_EMOJI={
-  "Fruity":"https://images.unsplash.com/photo-1528823872057-9c018575b3b6?w=200&q=80",
-  "Crisp & fresh":"https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=200&q=80",
-  "Bold & full":"https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=200&q=80",
-  "Earthy":"https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=200&q=80",
-  "Floral":"https://images.unsplash.com/photo-1490750967868-88df5691cc45?w=200&q=80",
-  "Smoky":"https://images.unsplash.com/photo-1607434472257-d9f8e57a643d?w=200&q=80",
-  "Sweet & rich":"https://images.unsplash.com/photo-1606312619070-d48b9c7e3d0f?w=200&q=80",
-  "Spiced":"https://images.unsplash.com/photo-1532336414038-cf19250c5757?w=200&q=80",
-  "Light":"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&q=80",
-  "Bubbly":"https://images.unsplash.com/photo-1547595628-c61a29f496f0?w=200&q=80",
+  "Fruity":      "https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=200&q=80",
+  "Crisp & fresh":"https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=200&q=80",
+  "Bold & full": "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=200&q=80",
+  "Earthy":      "https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?w=200&q=80",
+  "Floral":      "https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=200&q=80",
+  "Smoky":       "https://images.unsplash.com/photo-1558618048-f416fa3f6ef2?w=200&q=80",
+  "Sweet & rich":"https://images.unsplash.com/photo-1511381939415-e44015466834?w=200&q=80",
+  "Spiced":      "https://images.unsplash.com/photo-1506619216599-9d16d0903dfd?w=200&q=80",
+  "Light":       "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&q=80",
+  "Bubbly":      "https://images.unsplash.com/photo-1534353436294-0dbd4bdac845?w=200&q=80",
 };
-const FOOD_EMOJI={"Steak":"🥩","Lamb":"🍖","Seafood":"🦞","Sushi":"🍣","Pasta":"🍝","Pizza":"🍕","Cheese":"🧀","Charcuterie":"🥓","Dessert":"🍰","Chocolate":"🍫","Dark chocolate":"🍫","Just sipping":"🛋️","BBQ":"🔥","Salads":"🥗","Vegetarian":"🥦","Oysters":"🦪","Goat cheese":"🧀","Picnic":"🧺","Celebrations":"🥳","Tapas":"🫙","Light pasta":"🍝","Pork":"🍖","Chicken":"🍗","Salmon":"🐟","Spicy food":"🌶","Fruit tart":"🥧","Blue cheese":"🧀","Mushroom dishes":"🍄","Risotto":"🍚","Duck":"🍗"};
-const OCC_EMOJI={"Casual night":"😌","Romantic":"❤️","Celebration":"🥳","Dinner party":"🥘","Unwinding":"🛁","As a gift":"🎁"};
+const FOOD_EMOJI={
+  "Steak":          "https://images.unsplash.com/photo-1558030006-450675393462?w=200&q=80",
+  "Lamb":           "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200&q=80",
+  "Seafood":        "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=200&q=80",
+  "Sushi":          "https://images.unsplash.com/photo-1553621042-f6e147245754?w=200&q=80",
+  "Pasta":          "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=200&q=80",
+  "Pizza":          "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200&q=80",
+  "Cheese":         "https://images.unsplash.com/photo-1452195100486-9cc805987862?w=200&q=80",
+  "Charcuterie":    "https://images.unsplash.com/photo-1541014741259-de529411b96a?w=200&q=80",
+  "Dessert":        "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=200&q=80",
+  "Chocolate":      "https://images.unsplash.com/photo-1511381939415-e44015466834?w=200&q=80",
+  "Dark chocolate": "https://images.unsplash.com/photo-1511381939415-e44015466834?w=200&q=80",
+  "Just sipping":   "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=200&q=80",
+  "BBQ":            "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=200&q=80",
+  "Salads":         "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200&q=80",
+  "Vegetarian":     "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=200&q=80",
+  "Oysters":        "https://images.unsplash.com/photo-1606731219412-b8c72b6e4213?w=200&q=80",
+  "Goat cheese":    "https://images.unsplash.com/photo-1452195100486-9cc805987862?w=200&q=80",
+  "Picnic":         "https://images.unsplash.com/photo-1526041092449-209d556f42b3?w=200&q=80",
+  "Celebrations":   "https://images.unsplash.com/photo-1534353436294-0dbd4bdac845?w=200&q=80",
+  "Tapas":          "https://images.unsplash.com/photo-1515443961218-a51367888e4b?w=200&q=80",
+  "Light pasta":    "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=200&q=80",
+  "Pork":           "https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=200&q=80",
+  "Chicken":        "https://images.unsplash.com/photo-1598103442097-8b74394b95c3?w=200&q=80",
+  "Salmon":         "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=200&q=80",
+  "Spicy food":     "https://images.unsplash.com/photo-1544510807-aef6ca4f53e8?w=200&q=80",
+  "Fruit tart":     "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=200&q=80",
+  "Blue cheese":    "https://images.unsplash.com/photo-1452195100486-9cc805987862?w=200&q=80",
+  "Mushroom dishes":"https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?w=200&q=80",
+  "Risotto":        "https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=200&q=80",
+  "Duck":           "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200&q=80",
+};
+const OCC_EMOJI={
+  "Casual night":  "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=200&q=80",
+  "Romantic":      "https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=200&q=80",
+  "Celebration":   "https://images.unsplash.com/photo-1534353436294-0dbd4bdac845?w=200&q=80",
+  "Dinner party":  "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=200&q=80",
+  "Unwinding":     "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80",
+  "As a gift":     "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=200&q=80",
+};
 const OCC_TYPE={"Casual night":["white","red","rose"],"Romantic":["red","sparkling","rose"],"Celebration":["sparkling","white","rose"],"Dinner party":["red","white","sparkling"],"Unwinding":["white","red","rose","dessert"],"As a gift":["red","sparkling"]};
 const FLOAT_ANIMS=['float0','float1','float2','float3','float4','float5'];
 
@@ -2084,18 +2122,32 @@ function buildFoods(){
   wines.filter(w=>!w.consumed&&w.qty>0).forEach(w=>{(w.pairings||[]).forEach(p=>{score[p]=(score[p]||0)+w.qty;});});
   return score;
 }
-function scoreToSize(s,min,max){const MIN=72,MAX=108;if(max===min)return(MIN+MAX)/2;return Math.round(MIN+((s-min)/(max-min))*(MAX-MIN));}
+function scoreToSize(s,min,max){
+  // All bubbles same size — clean and consistent
+  return 84;
+}
 function packBubbles(sizes,W,H){
-  const pad=10,positions=[],MAX_T=400;
-  sizes.forEach(sz=>{const r=sz/2;let placed=false;for(let t=0;t<MAX_T;t++){const x=pad+r+Math.random()*(W-sz-pad*2),y=pad+r+Math.random()*(H-sz-pad*2);let ok=true;for(const p of positions){if(Math.hypot(x-p.cx,y-p.cy)<r+p.r+8){ok=false;break;}}if(ok){positions.push({x:x-r,y:y-r,cx:x,cy:y,r,sz});placed=true;break;}}if(!placed){const r2=sz/2;positions.push({x:pad,y:pad+positions.length*(sz+8),cx:pad+r2,cy:pad+r2+positions.length*(sz+8),r:r2,sz});}});
+  // Equal size bubbles — arrange in organic offset rows
+  const sz=sizes[0]||84;
+  const r=sz/2;
+  const cols=Math.floor((W-16)/(sz+12));
+  const positions=[];
+  sizes.forEach((s,i)=>{
+    const col=i%cols;
+    const row=Math.floor(i/cols);
+    const rowOffset=(row%2===1)?( sz/2+6):0;
+    const x=12+r+col*(sz+12)+rowOffset;
+    const y=10+r+row*(sz+10);
+    positions.push({x:x-r,y:y-r,cx:x,cy:y,r,sz:s});
+  });
   return positions;
 }
 function attachFloat(el,i){const a=FLOAT_ANIMS[i%FLOAT_ANIMS.length],dur=(4+Math.random()*4).toFixed(1),delay=(-(Math.random()*6)).toFixed(1);el.style.animation=`${a} ${dur}s ${delay}s ease-in-out infinite`;}
 
 const TONIGHT_STEPS=[
-  {id:'mood',q:"What's your <em>mood</em> tonight?",hint:"Flavours from your actual cellar",multi:true,buildData:buildMoods,getEmoji:k=>MOOD_EMOJI[k]||'🍷'},
-  {id:'food',q:"What are you <em>eating</em>?",hint:"Pairings your wines actually suggest",multi:true,buildData:buildFoods,getEmoji:k=>FOOD_EMOJI[k]||'🍽️'},
-  {id:'occasion',q:"What's the <em>occasion</em>?",hint:"Pick one — or skip",multi:false,buildData:()=>({'Casual night':1,'Romantic':1,'Celebration':1,'Dinner party':1,'Unwinding':1,'As a gift':1}),getEmoji:k=>OCC_EMOJI[k]||'🎉'},
+  {id:'mood',q:"What's your <em>mood</em> tonight?",hint:"Drawn from what's resting in your cellar",multi:true,buildData:buildMoods,getEmoji:k=>MOOD_EMOJI[k]||null},
+  {id:'food',q:"What are you <em>eating</em>?",hint:"Pairings your wines actually suggest",multi:true,buildData:buildFoods,getEmoji:k=>FOOD_EMOJI[k]||null},
+  {id:'occasion',q:"What's the <em>occasion</em>?",hint:"Pick one — or skip",multi:false,buildData:()=>({'Casual night':1,'Romantic':1,'Celebration':1,'Dinner party':1,'Unwinding':1,'As a gift':1}),getEmoji:k=>OCC_EMOJI[k]||null},
 ];
 let tStep=0,tSel={mood:[],food:[],occasion:[]};
 
@@ -2157,7 +2209,7 @@ function showTonightResults(){
     const bar=TYPE_BAR[wine.type]||'bar-red';
     let bCls,bTxt;if(i===0){bCls='bb';bTxt='⭐ Best match';}else if(score>=7){bCls='bg';bTxt='✓ Great match';}else{bCls='bm';bTxt='· Good match';}
     const tagH=(wine.flavours||[]).slice(0,3).map(f=>{const c=TAG_COL[f]||{bg:'#f0ebe3',c:'#5c3d28'};return`<span class="rtag ${mFlavours.includes(f)?'lit':''}" style="background:${c.bg};color:${c.c};">${f}</span>`;}).join('')+mFoods.slice(0,2).map(f=>`<span class="rtag lit" style="background:#EAF3DE;color:#27500A;">🍽 ${f}</span>`).join('');
-    return`<div class="rcard" onclick="closeTonightResults();openDetailScreen(${wine.id})"><div class="rcard-bar ${bar}"></div><div class="rcard-inner"><span class="rcard-badge ${bCls}">${bTxt}</span><div class="rcard-name">${wine.name}</div><div class="rcard-meta">${[wine.grape,wine.region,wine.country].filter(Boolean).join(' · ')}${wine.vintage?' · '+wine.vintage:''}</div><div class="rcard-foot"><div class="rcard-tags">${tagH}</div><div style="display:flex;align-items:center;gap:8px;flex-shrink:0;"><div class="qty-ring"><div class="qty-ring-n">${wine.qty}</div><div class="qty-ring-l">left</div></div><div class="rcard-aux"><div class="rcard-stars">${'★'.repeat(Math.floor(wine.rating||0))}${'☆'.repeat(5-Math.floor(wine.rating||0))}</div>${wine.price?'<div class="rcard-price">RM '+wine.price.toLocaleString()+'</div>':''}</div></div></div></div></div>`;
+    return`<div class="rcard" onclick="closeTonightResults();openDetailScreen('${wine.id}')"><div class="rcard-bar ${bar}"></div><div class="rcard-inner"><span class="rcard-badge ${bCls}">${bTxt}</span><div class="rcard-name">${wine.name}</div><div class="rcard-meta">${[wine.grape,wine.region,wine.country].filter(Boolean).join(' · ')}${wine.vintage?' · '+wine.vintage:''}</div><div class="rcard-foot"><div class="rcard-tags">${tagH}</div><div style="display:flex;align-items:center;gap:8px;flex-shrink:0;"><div class="qty-ring"><div class="qty-ring-n">${wine.qty}</div><div class="qty-ring-l">left</div></div><div class="rcard-aux"><div class="rcard-stars">${'★'.repeat(Math.floor(wine.rating||0))}${'☆'.repeat(5-Math.floor(wine.rating||0))}</div>${wine.price?'<div class="rcard-price">RM '+wine.price.toLocaleString()+'</div>':''}</div></div></div></div></div>`;
   }).join('');
   const consumed=wines.filter(w=>w.consumed||w.qty===0);
   if(consumed.length){scroll.innerHTML+='<div class="csep">Loved before · now consumed</div>'+consumed.map(w=>`<div class="ccard"><div><div class="ccard-name">${w.name}</div><div class="ccard-meta">${w.type} · ${'★'.repeat(Math.floor(w.rating||0))}</div></div><button class="restock-pill" onclick="event.stopPropagation();showToast('${w.name.replace(/'/g,"\\'")} noted for restock 🛒')">+ Restock</button></div>`).join('');}
