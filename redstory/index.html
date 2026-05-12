@@ -1,0 +1,2174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>My Cellar</title>
+<meta name="description" content="Your personal wine journal"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="My Cellar"/>
+<meta name="theme-color" content="#1a0d05"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icon.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+:root{
+  /* Classic Cellar (default) */
+  --bg:#1a0d05;--bg2:#231108;--card:#fdf7ef;--card2:#f4ead8;--parch:#f2e8d9;
+  --ink:#1e120a;--ink2:#5c3d28;--ink3:#9c7a60;--ink4:#c4a98a;
+  --amber:#b8712a;--amber2:#d4924a;--amber3:#f0c070;--wine:#7c2230;--teal:#2a6b5a;
+  --border:rgba(120,80,40,0.13);--border2:rgba(120,80,40,0.25);
+  --nav-bg:rgba(18,7,2,0.97);--status-bg:#1a0d05;
+  --serif:'Cormorant Garamond',Georgia,serif;--sans:'Jost',system-ui,sans-serif;
+  --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
+}
+/* ── LAKE TEKAPO — midnight alpine lake, stars, aurora ── */
+[data-theme="tekapo"]{
+  --bg:#0a0e1a;--bg2:#0d1220;--card:#f0f4ff;--card2:#e4eaf8;--parch:#edf1ff;
+  --ink:#0a0e20;--ink2:#1e2a4a;--ink3:#5a6a9a;--ink4:#9aaac8;
+  --amber:#7c9fe0;--amber2:#a0bef0;--amber3:#c8dcff;--wine:#4a2060;--teal:#2a6080;
+  --border:rgba(80,100,160,0.14);--border2:rgba(80,100,160,0.28);
+  --nav-bg:rgba(6,8,18,0.97);--status-bg:#0a0e1a;
+}
+/* ── ZERMATT MORNING — crisp alps dawn, golden mist ── */
+[data-theme="zermatt"]{
+  --bg:#f5f0e8;--bg2:#ede7da;--card:#ffffff;--card2:#f8f3ec;--parch:#fdfaf5;
+  --ink:#1a1410;--ink2:#3d3020;--ink3:#7a6550;--ink4:#b0987a;
+  --amber:#c07828;--amber2:#d8922e;--amber3:#f0b840;--wine:#7a2020;--teal:#2a5040;
+  --border:rgba(100,70,30,0.12);--border2:rgba(100,70,30,0.22);
+  --nav-bg:rgba(240,234,224,0.97);--status-bg:#f5f0e8;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;height:100%;position:relative;transition:background 0.6s ease,color 0.6s ease;}
+/* Wallpaper layer — rendered as pure CSS art behind everything */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:1;transition:opacity 0.8s ease;}
+/* Classic — rich cellar dark, subtle vignette */
+[data-theme="classic"] body::before,body::before{
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(80,20,10,0.6) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 20% 100%, rgba(60,10,5,0.5) 0%, transparent 60%),
+    radial-gradient(ellipse 100% 100% at 50% 50%, #1a0d05 0%, #110804 100%);
+}
+/* Lake Tekapo wallpaper — pure CSS night lake */
+[data-theme="tekapo"] body::before{
+  background:
+    /* Aurora wisps */
+    radial-gradient(ellipse 120% 25% at 30% 18%, rgba(0,200,120,0.13) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 20% at 70% 12%, rgba(80,0,200,0.10) 0%, transparent 55%),
+    radial-gradient(ellipse 100% 15% at 50% 22%, rgba(0,150,200,0.09) 0%, transparent 50%),
+    /* Stars — scattered bright dots via layered radials */
+    radial-gradient(1px 1px at 15% 8%, rgba(255,255,255,0.9) 0%, transparent 1px),
+    radial-gradient(1px 1px at 72% 5%, rgba(255,255,255,0.8) 0%, transparent 1px),
+    radial-gradient(1.5px 1.5px at 45% 3%, rgba(255,255,255,1) 0%, transparent 1.5px),
+    radial-gradient(1px 1px at 88% 11%, rgba(255,255,255,0.7) 0%, transparent 1px),
+    radial-gradient(1px 1px at 33% 14%, rgba(255,255,255,0.85) 0%, transparent 1px),
+    radial-gradient(1px 1px at 60% 9%, rgba(255,255,255,0.75) 0%, transparent 1px),
+    radial-gradient(1px 1px at 22% 18%, rgba(255,255,255,0.6) 0%, transparent 1px),
+    radial-gradient(1px 1px at 80% 16%, rgba(255,255,255,0.8) 0%, transparent 1px),
+    radial-gradient(1px 1px at 55% 21%, rgba(255,255,255,0.5) 0%, transparent 1px),
+    radial-gradient(1px 1px at 10% 25%, rgba(255,255,255,0.65) 0%, transparent 1px),
+    radial-gradient(1px 1px at 93% 7%, rgba(255,255,255,0.9) 0%, transparent 1px),
+    radial-gradient(1px 1px at 38% 6%, rgba(255,255,255,0.7) 0%, transparent 1px),
+    radial-gradient(1.5px 1.5px at 68% 15%, rgba(220,230,255,0.9) 0%, transparent 2px),
+    radial-gradient(1px 1px at 5% 13%, rgba(255,255,255,0.55) 0%, transparent 1px),
+    /* Mountain silhouette */
+    linear-gradient(180deg,
+      transparent 0%,
+      transparent 28%,
+      rgba(8,12,28,0.95) 28%,
+      rgba(5,8,20,1) 38%,
+      rgba(5,8,20,1) 48%,
+      /* Lake reflection — mirror of sky */
+      rgba(8,14,30,0.98) 48%,
+      rgba(10,18,38,0.95) 58%,
+      rgba(12,18,40,0.9) 70%,
+      rgba(8,12,30,1) 100%
+    ),
+    /* Sky gradient */
+    linear-gradient(180deg, #03040e 0%, #050a1a 20%, #080e22 35%, #0a1228 50%);
+}
+/* Mountain peak shapes for Tekapo */
+[data-theme="tekapo"] body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    /* Matterhorn-like left peak */
+    linear-gradient(165deg, transparent 0%, transparent 61%, #06091a 61.5%, #06091a 100%),
+    linear-gradient(195deg, transparent 0%, transparent 55%, #07091c 55.5%, #07091c 100%);
+  clip-path:polygon(0% 100%, 0% 42%, 12% 28%, 20% 36%, 28% 22%, 38% 35%, 50% 28%, 62% 38%, 72% 25%, 82% 35%, 92% 30%, 100% 38%, 100% 100%);
+}
+/* Zermatt wallpaper — alpine dawn */
+[data-theme="zermatt"] body::before{
+  background:
+    /* Sun halo */
+    radial-gradient(ellipse 40% 30% at 75% 15%, rgba(255,220,120,0.35) 0%, transparent 60%),
+    radial-gradient(ellipse 25% 20% at 75% 15%, rgba(255,200,80,0.25) 0%, transparent 40%),
+    /* Mist layers */
+    radial-gradient(ellipse 120% 20% at 50% 45%, rgba(255,245,230,0.5) 0%, transparent 70%),
+    radial-gradient(ellipse 100% 15% at 30% 55%, rgba(240,230,215,0.4) 0%, transparent 65%),
+    /* Snow peak glow */
+    radial-gradient(ellipse 30% 20% at 40% 25%, rgba(255,250,240,0.6) 0%, transparent 50%),
+    /* Sky dawn gradient */
+    linear-gradient(180deg,
+      #b8cce0 0%,
+      #d4c8b8 15%,
+      #e8d8c0 25%,
+      #f0e4cc 35%,
+      #f5ede0 45%,
+      #f2ece4 55%,
+      #ede8e0 65%,
+      #e8e2d8 75%,
+      #e4ddd0 100%
+    );
+}
+[data-theme="zermatt"] body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  /* Matterhorn peak silhouette */
+  background:linear-gradient(180deg,rgba(180,170,160,0.7) 0%,rgba(200,190,178,0.5) 30%,transparent 60%);
+  clip-path:polygon(0% 100%, 0% 72%, 8% 65%, 15% 68%, 22% 55%, 28% 60%, 35% 42%, 40% 38%, 45% 42%, 50% 30%, 55% 38%, 60% 45%, 68% 50%, 75% 40%, 82% 52%, 90% 60%, 100% 65%, 100% 100%);
+  opacity:0.55;
+}
+/* Noise texture on top */
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;opacity:0.35;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");}
+[data-theme="tekapo"] body::after,[data-theme="zermatt"] body::after{background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");clip-path:none;background:none;}
+
+/* SCREEN SYSTEM */
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:transparent;transition:transform 0.36s cubic-bezier(0.32,0.72,0,1),opacity 0.36s ease;will-change:transform,opacity;overflow:hidden;}
+/* Translucent overlay per screen so wallpaper shows through subtly */
+.screen::before{content:'';position:absolute;inset:0;background:var(--bg);opacity:0.88;pointer-events:none;z-index:0;}
+[data-theme="tekapo"] .screen::before{opacity:0.82;}
+[data-theme="zermatt"] .screen::before{opacity:0.78;}
+.screen>*{position:relative;z-index:1;}
+.screen.hidden{transform:translateX(100%);opacity:0;pointer-events:none;}
+.screen.back{transform:translateX(-28%);opacity:0;pointer-events:none;}
+.screen.active{transform:translateX(0);opacity:1;}
+
+/* STATUS BAR */
+.statusbar{background:var(--nav-bg);padding-top:var(--safe-top);height:calc(44px + var(--safe-top));display:flex;align-items:flex-end;justify-content:space-between;padding-left:28px;padding-right:28px;padding-bottom:8px;flex-shrink:0;}
+.sb-time{font-size:14px;font-weight:500;color:rgba(255,255,255,0.82);}
+.sb-icons{display:flex;gap:5px;color:rgba(255,255,255,0.6);font-size:11px;}
+
+/* BOTTOM NAV */
+.bnav{background:var(--nav-bg);border-top:0.5px solid rgba(255,255,255,0.07);display:flex;flex-shrink:0;padding-bottom:var(--safe-bottom);}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 12px;border:none;background:none;cursor:pointer;position:relative;}
+.ni.on::before{content:'';position:absolute;top:6px;width:18px;height:2px;border-radius:2px;background:var(--amber);}
+.ni:not(.on){opacity:0.30;}
+.ni-icon{font-size:20px;line-height:1;}
+.ni-lbl{font-size:9px;letter-spacing:0.10em;text-transform:uppercase;font-weight:500;color:rgba(255,255,255,0.45);}
+.ni.on .ni-lbl{color:var(--amber2);}
+
+/* SHARED */
+.icon-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.13);color:var(--amber2);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.15s;}
+.icon-btn:active{background:rgba(255,255,255,0.16);}
+.back-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.13);color:var(--amber2);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.scrollable{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.scrollable::-webkit-scrollbar{width:3px;}
+.scrollable::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.parch-bg{background:var(--parch);border-radius:28px 28px 0 0;}
+.info-card{background:var(--card);border-radius:18px;border:0.5px solid var(--border);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.05);margin:12px 16px 0;}
+.info-card-title{padding:10px 16px;border-bottom:0.5px solid var(--border);font-size:9px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink3);background:var(--card2);display:flex;align-items:center;gap:8px;}
+.info-row{padding:12px 16px;border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.info-row:last-child{border-bottom:none;}
+.info-key{font-size:12px;color:var(--ink3);flex-shrink:0;}
+.info-val{font-family:var(--serif);font-size:16px;color:var(--ink);font-weight:500;text-align:right;}
+.info-val.empty{font-family:var(--sans);font-size:13px;color:var(--ink4);font-style:italic;font-weight:300;}
+.tag{font-size:10px;font-weight:500;padding:3px 10px;border-radius:10px;white-space:nowrap;}
+.toast-el{position:fixed;bottom:calc(90px + var(--safe-bottom));left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--amber2);font-family:var(--serif);font-size:15px;font-weight:500;padding:11px 22px;border-radius:24px;box-shadow:0 8px 24px rgba(0,0,0,0.35);opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;z-index:500;}
+.toast-el.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* CELLAR */
+#s-cellar .cellar-header{background:var(--bg);padding:8px 24px 0;flex-shrink:0;position:relative;}
+#s-cellar .cellar-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(184,113,42,0.4) 30%,rgba(184,113,42,0.4) 70%,transparent);}
+.cellar-title-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px;}
+.cellar-title{font-family:var(--serif);font-size:36px;font-weight:600;color:var(--amber2);line-height:1;}
+.cellar-sub{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px;}
+.header-actions{display:flex;gap:8px;align-items:center;margin-top:4px;}
+.add-fab{background:var(--amber);border-color:transparent;color:#fff;font-size:22px;}
+.stats-strip{display:grid;grid-template-columns:repeat(3,1fr);background:var(--bg);padding:12px 24px 14px;flex-shrink:0;}
+.stat-item{text-align:center;position:relative;}
+.stat-item:not(:last-child)::after{content:'';position:absolute;right:0;top:20%;bottom:20%;width:0.5px;background:rgba(255,255,255,0.1);}
+.stat-num{font-family:var(--serif);font-size:28px;font-weight:600;color:var(--amber2);line-height:1;}
+.stat-lbl{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3);margin-top:3px;}
+.filter-row{background:var(--bg);padding:0 20px 14px;display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;}
+.filter-row::-webkit-scrollbar{display:none;}
+.fpill{flex-shrink:0;padding:7px 18px;border-radius:24px;font-family:var(--sans);font-size:12px;border:0.5px solid rgba(255,255,255,0.14);background:transparent;color:rgba(255,255,255,0.5);cursor:pointer;transition:all 0.18s;white-space:nowrap;}
+.fpill.on{background:var(--amber);border-color:var(--amber);color:#fff;font-weight:500;}
+.search-wrap{background:var(--bg);padding:0 20px 14px;flex-shrink:0;}
+.search-inner{position:relative;}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;opacity:0.35;pointer-events:none;}
+.search-bar{width:100%;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);border-radius:12px;padding:10px 16px 10px 38px;font-family:var(--sans);font-size:13px;color:rgba(255,255,255,0.8);outline:none;}
+.search-bar::placeholder{color:rgba(255,255,255,0.28);}
+.search-bar:focus{border-color:rgba(184,113,42,0.5);}
+.wine-list-wrap{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--parch);border-radius:28px 28px 0 0;padding:4px 16px 0;}
+.wine-list-wrap::-webkit-scrollbar{width:3px;}
+.wine-list-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.list-header{padding:14px 4px 10px;display:flex;justify-content:space-between;align-items:center;}
+.list-count{font-size:11px;color:var(--ink3);letter-spacing:0.06em;text-transform:uppercase;}
+.sort-btn{font-size:11px;color:var(--amber);background:none;border:none;cursor:pointer;font-family:var(--sans);}
+.wine-list{display:flex;flex-direction:column;gap:10px;padding-bottom:20px;}
+.wcard{background:var(--card);border-radius:18px;border:0.5px solid var(--border);overflow:hidden;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.06);transition:transform 0.12s;animation:cardIn 0.3s ease both;}
+.wcard:active{transform:scale(0.982);}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.wcard-inner{display:flex;align-items:stretch;min-height:88px;}
+.wcard-stripe{width:5px;flex-shrink:0;}
+.stripe-red{background:linear-gradient(180deg,#9b2335,#6b1522);}
+.stripe-white{background:linear-gradient(180deg,#c4970a,#9a720a);}
+.stripe-rose{background:linear-gradient(180deg,#c9547a,#a03660);}
+.stripe-sparkling{background:linear-gradient(180deg,#4a9e8f,#2d7a6c);}
+.stripe-dessert{background:linear-gradient(180deg,#8b5e9b,#6a3d7e);}
+.wcard-thumb{width:56px;flex-shrink:0;position:relative;overflow:hidden;}
+.wcard-thumb img{width:100%;height:100%;object-fit:cover;}
+.wcard-thumb-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:22px;opacity:0.55;}
+.scan-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:300;flex-direction:column;align-items:center;justify-content:center;gap:16px;max-width:430px;margin:0 auto;}
+.scan-overlay.open{display:flex;}
+.scan-spinner{width:48px;height:48px;border:3px solid rgba(255,255,255,0.15);border-top-color:var(--amber2);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.scan-msg{font-family:var(--serif);font-size:20px;color:var(--amber2);text-align:center;}
+.scan-sub{font-size:12px;color:var(--ink3);text-align:center;line-height:1.6;max-width:260px;}
+.scan-preview-img{width:160px;height:200px;border-radius:12px;object-fit:cover;border:2px solid var(--amber);margin-bottom:4px;}
+.scan-cancel{padding:10px 24px;border-radius:20px;border:0.5px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.5);font-family:var(--sans);font-size:13px;cursor:pointer;}
+.photo-btns{display:flex;gap:10px;margin:14px 16px 0;}
+.photo-btn{flex:1;padding:14px 10px;border-radius:14px;border:1.5px dashed var(--border2);background:rgba(255,255,255,0.5);display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:all 0.15s;}
+.photo-btn:active{border-color:var(--amber);background:rgba(250,235,212,0.6);}
+.photo-btn-icon{font-size:26px;}
+.photo-btn-lbl{font-size:11px;color:var(--ink3);font-weight:500;text-align:center;line-height:1.4;}
+.photo-btn.scan-btn{border-color:rgba(184,113,42,0.4);background:rgba(250,235,212,0.35);}
+.photo-btn.scan-btn .photo-btn-lbl{color:var(--amber);}
+.photo-preview-wrap{margin:0 16px;display:none;}
+.photo-preview-wrap.show{display:block;}
+.photo-preview{width:100%;max-height:160px;object-fit:cover;border-radius:12px;}
+.scan-filled{margin:8px 16px 0;padding:10px 14px;background:#faebd4;border-radius:10px;border:0.5px solid rgba(184,113,42,0.3);font-size:11px;color:var(--amber);display:none;align-items:center;gap:8px;}
+.scan-filled.show{display:flex;}
+.wcard-body{flex:1;padding:13px 14px 11px;min-width:0;}
+.wcard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:2px;}
+.wine-name{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);line-height:1.15;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.qty-row{display:flex;align-items:center;background:var(--card2);border-radius:10px;overflow:hidden;border:0.5px solid var(--border);}
+.qty-tap{width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--ink2);border:none;background:none;cursor:pointer;font-weight:300;}
+.qty-tap:active{background:var(--border);}
+.qty-val{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--ink);min-width:20px;text-align:center;}
+.wine-sub{font-size:11px;color:var(--ink3);margin-bottom:7px;font-weight:300;}
+.wcard-meta{display:flex;justify-content:space-between;align-items:center;}
+.tag-row{display:flex;gap:5px;flex-wrap:nowrap;overflow:hidden;flex:1;margin-right:8px;}
+.wine-stars{font-size:10px;color:var(--amber);letter-spacing:1.5px;flex-shrink:0;}
+.empty-state{display:flex;flex-direction:column;align-items:center;padding:60px 32px;text-align:center;gap:12px;}
+.empty-icon{font-size:48px;opacity:0.22;}
+.empty-title{font-family:var(--serif);font-size:22px;color:var(--ink2);}
+.empty-sub{font-size:13px;color:var(--ink3);line-height:1.6;}
+.empty-cta{margin-top:8px;padding:12px 28px;background:var(--amber);border:none;border-radius:24px;font-family:var(--sans);font-size:14px;font-weight:500;color:#fff;cursor:pointer;}
+
+/* ADD SCREEN */
+#s-add .add-topbar{background:var(--bg);padding:10px 20px 16px;display:flex;align-items:center;gap:14px;flex-shrink:0;position:relative;}
+#s-add .add-topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(184,113,42,0.35) 30%,rgba(184,113,42,0.35) 70%,transparent);}
+.add-title{font-family:var(--serif);font-size:28px;font-weight:600;color:var(--amber2);line-height:1;}
+.add-sub{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink3);margin-top:3px;}
+.form-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--parch);border-radius:28px 28px 0 0;padding-bottom:20px;}
+.form-scroll::-webkit-scrollbar{width:3px;}
+.form-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.form-section{background:var(--card);border-radius:18px;border:0.5px solid var(--border);margin:14px 16px 0;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.section-title{padding:10px 16px;border-bottom:0.5px solid var(--border);font-size:9px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink3);background:var(--card2);display:flex;align-items:center;gap:8px;}
+.field{padding:12px 16px;border-bottom:0.5px solid var(--border);display:flex;flex-direction:column;gap:4px;}
+.field:last-child{border-bottom:none;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;}
+.field-row .field:first-child{border-right:0.5px solid var(--border);}
+.flbl{font-size:9px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3);}
+.finput{font-family:var(--serif);font-size:17px;color:var(--ink);background:none;border:none;outline:none;width:100%;}
+.finput::placeholder{color:var(--ink4);font-style:italic;font-size:15px;font-family:var(--sans);font-weight:300;}
+.fselect{font-family:var(--serif);font-size:17px;color:var(--ink);background:none;border:none;outline:none;width:100%;-webkit-appearance:none;cursor:pointer;}
+.photo-area{margin:14px 16px 0;border:1.5px dashed var(--border2);border-radius:18px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;background:rgba(255,255,255,0.5);}
+.photo-area:active{border-color:var(--amber);background:rgba(250,235,212,0.6);}
+.photo-preview{width:100%;max-height:160px;object-fit:cover;border-radius:12px;display:none;}
+.photo-icon{font-size:30px;opacity:0.35;}
+.photo-txt{font-size:13px;color:var(--ink3);text-align:center;line-height:1.5;}
+.grape-scroll{padding:12px 16px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;}
+.grape-scroll::-webkit-scrollbar{display:none;}
+.grape-chip{flex-shrink:0;padding:7px 16px;border-radius:20px;font-size:12px;border:0.5px solid var(--border2);background:var(--card2);color:var(--ink2);cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.grape-chip.on{background:var(--amber);border-color:var(--amber);color:#fff;font-weight:500;}
+.suggest-banner{margin:0 16px 2px;padding:9px 13px;background:#faebd4;border-radius:10px;border:0.5px solid rgba(184,113,42,0.3);font-size:11px;color:var(--amber);font-weight:500;display:none;}
+.suggest-banner.show{display:block;}
+.ftags-wrap{padding:8px 16px 14px;display:flex;flex-wrap:wrap;gap:7px;}
+.ftag{padding:5px 13px;border-radius:20px;font-size:11px;font-weight:500;border:0.5px solid transparent;cursor:pointer;transition:opacity 0.15s,box-shadow 0.15s;}
+.ftag.on{box-shadow:0 0 0 2px var(--amber);}
+.ftag.dim{opacity:0.3;}
+.ftag-more{padding:5px 13px;border-radius:20px;font-size:11px;border:1px dashed var(--border2);color:var(--ink3);cursor:pointer;background:transparent;display:flex;align-items:center;gap:4px;}
+.all-flavours{display:none;padding:0 16px 14px;}
+.all-flavours.open{display:block;}
+.fg-name{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3);font-weight:500;margin-bottom:7px;margin-top:12px;}
+.collapse-btn{width:calc(100% - 32px);margin:0 16px 14px;padding:9px;border-radius:10px;border:0.5px solid var(--border2);background:transparent;color:var(--ink3);font-family:var(--sans);font-size:12px;cursor:pointer;display:none;}
+.collapse-btn.show{display:block;}
+.star-row{padding:14px 16px 10px;display:flex;gap:6px;align-items:center;}
+.star-wrap{position:relative;width:32px;height:32px;cursor:pointer;flex-shrink:0;transition:transform 0.15s;}
+.star-wrap:active{transform:scale(1.18);}
+.star-wrap span{position:absolute;inset:0;font-size:30px;line-height:32px;text-align:center;pointer-events:none;transition:opacity 0.12s;}
+.s-empty{color:#e0d4c4;opacity:1;}
+.s-full{color:var(--amber);opacity:0;}
+.s-half{color:var(--amber);opacity:0;clip-path:inset(0 50% 0 0);}
+.star-wrap[data-state="full"] .s-empty{opacity:0;}
+.star-wrap[data-state="full"] .s-full{opacity:1;}
+.star-wrap[data-state="half"] .s-half{opacity:1;}
+.rating-lbl{font-size:12px;color:var(--ink3);margin-left:6px;}
+.qty-big-row{padding:12px 20px;display:flex;align-items:center;justify-content:space-between;}
+.qty-big-btn{width:44px;height:44px;border-radius:50%;background:var(--card2);border:0.5px solid var(--border2);font-size:22px;color:var(--ink2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:300;}
+.qty-big-num{font-family:var(--serif);font-size:38px;font-weight:600;color:var(--ink);}
+.notes-input{font-family:var(--sans);font-size:14px;color:var(--ink);background:none;border:none;outline:none;width:100%;resize:none;min-height:68px;line-height:1.6;padding:0;}
+.notes-input::placeholder{color:var(--ink4);font-style:italic;}
+.save-bar{background:var(--bg);padding:12px 20px calc(12px + var(--safe-bottom));flex-shrink:0;border-top:0.5px solid rgba(255,255,255,0.07);}
+.save-btn{width:100%;padding:16px;background:var(--amber);border:none;border-radius:14px;font-family:var(--serif);font-size:19px;font-weight:600;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.15s;}
+.save-btn:active{background:var(--amber2);transform:scale(0.98);}
+
+/* DETAIL SCREEN */
+.detail-hero{background:var(--bg);padding:10px 20px 20px;flex-shrink:0;position:relative;}
+.detail-hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(184,113,42,0.4) 30%,rgba(184,113,42,0.4) 70%,transparent);}
+.hero-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.hero-actions{display:flex;gap:8px;}
+.hero-content{display:flex;gap:16px;align-items:flex-start;}
+.label-ph{width:80px;height:110px;border-radius:10px;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;flex-shrink:0;}
+.label-ph span:first-child{font-size:22px;opacity:0.4;}
+.label-ph span:last-child{font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:0.04em;text-transform:uppercase;}
+.label-img{width:80px;height:110px;border-radius:10px;object-fit:cover;flex-shrink:0;display:none;}
+.hero-text{flex:1;min-width:0;}
+.type-badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:10px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px;}
+.badge-red{background:#f5e8ea;color:#7c2230;}
+.badge-white{background:#faeeda;color:#633806;}
+.badge-rose{background:#fbeaf0;color:#72243e;}
+.badge-sparkling{background:#e2f0ed;color:#2a6b5a;}
+.badge-dessert{background:#eeedfe;color:#3c3489;}
+.hero-name{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--amber2);line-height:1.1;margin-bottom:4px;}
+.hero-producer{font-size:11px;color:var(--ink3);margin-bottom:10px;font-weight:300;}
+.hero-meta{display:flex;gap:12px;align-items:center;}
+.hero-vintage{font-family:var(--serif);font-size:19px;color:rgba(255,255,255,0.45);font-style:italic;}
+.hero-stars-wrap{display:flex;gap:2px;}
+.hstar{position:relative;width:18px;height:18px;flex-shrink:0;}
+.hstar span{position:absolute;inset:0;font-size:16px;line-height:18px;text-align:center;}
+.hs-bg{color:#e0d4c4;}
+.hs-fill{color:var(--amber);}
+.hs-half{color:var(--amber);clip-path:inset(0 50% 0 0);}
+.hero-rating-lbl{font-size:10px;color:var(--ink3);margin-top:3px;}
+.qty-card{margin:14px 16px 0;background:var(--card);border-radius:18px;border:0.5px solid var(--border);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,0.06);border-top:4px solid var(--amber);}
+.qty-left{display:flex;flex-direction:column;}
+.qty-lbl{font-size:9px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:2px;}
+.qty-big{font-family:var(--serif);font-size:52px;font-weight:600;color:var(--ink);line-height:1;transition:transform 0.15s;}
+.qty-unit{font-size:11px;color:var(--ink3);margin-top:2px;}
+.qty-ctrls{display:flex;flex-direction:column;gap:8px;}
+.qty-ctrl-btn{width:48px;height:48px;border-radius:14px;background:var(--card2);border:0.5px solid var(--border2);font-size:24px;color:var(--ink2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:300;transition:background 0.12s;}
+.qty-ctrl-btn:active{background:var(--border2);}
+.qty-ctrl-btn.minus{color:var(--wine);}
+.qty-ctrl-btn.plus{color:var(--amber);}
+.low-stock-warn{margin:8px 16px 0;padding:10px 14px;background:#fff8ec;border:0.5px solid rgba(184,113,42,0.3);border-radius:10px;font-size:12px;color:var(--amber);display:none;align-items:center;gap:8px;}
+.low-stock-warn.show{display:flex;}
+.action-grid{margin:12px 16px 0;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.act-btn{padding:14px 0;border-radius:14px;border:0.5px solid var(--border2);background:var(--card);font-family:var(--sans);font-size:13px;color:var(--ink2);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;transition:background 0.12s;}
+.act-btn:active{background:var(--card2);}
+.act-btn.danger{color:var(--wine);border-color:rgba(124,34,48,0.2);}
+.act-btn-icon{font-size:20px;}
+.notes-display{padding:13px 16px;font-size:14px;color:var(--ink2);line-height:1.7;font-style:italic;font-family:var(--serif);}
+.notes-empty{padding:13px 16px;font-size:13px;color:var(--ink4);font-style:italic;}
+.price-val{font-family:var(--serif);font-size:20px;color:var(--amber);font-weight:600;}
+.log-toggle-wrap{margin:14px 16px 0;}
+.log-toggle{display:flex;background:var(--card2);border-radius:14px;padding:3px;gap:3px;}
+.log-opt{flex:1;padding:9px 12px;border-radius:11px;font-size:12px;font-weight:500;text-align:center;cursor:pointer;transition:all 0.2s;border:none;background:transparent;color:var(--ink3);display:flex;align-items:center;justify-content:center;gap:6px;}
+.log-opt.on{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,0.12);}
+.tlog-card{background:var(--card);border-radius:14px;border:0.5px solid var(--border);margin-bottom:8px;overflow:hidden;}
+.tlog-header{padding:10px 14px;background:var(--card2);border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.tlog-date{font-size:12px;font-weight:500;color:var(--ink);}
+.tlog-mode{font-size:9px;padding:2px 8px;border-radius:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;}
+.mode-quick{background:#E1F5EE;color:#085041;}
+.mode-full{background:#FAEEDA;color:#633806;}
+.tlog-body{padding:10px 14px;display:flex;flex-direction:column;gap:6px;}
+.tlog-row{display:flex;justify-content:space-between;font-size:12px;gap:8px;}
+.tlog-key{color:var(--ink3);flex-shrink:0;}
+.tlog-val{color:var(--ink);font-weight:500;text-align:right;}
+.tlog-val.empty{color:var(--ink4);font-weight:300;font-style:italic;}
+.tlog-note{font-size:12px;color:var(--ink2);font-style:italic;padding-top:8px;border-top:0.5px solid var(--border);line-height:1.5;}
+.tlog-stars{color:var(--amber);font-size:11px;letter-spacing:1px;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-sheet{background:var(--card);border-radius:24px 24px 0 0;padding:24px 20px calc(24px + var(--safe-bottom));width:100%;max-width:430px;animation:sheetUp 0.22s ease;}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px;}
+.modal-title{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);margin-bottom:6px;}
+.modal-sub{font-size:13px;color:var(--ink3);line-height:1.5;margin-bottom:20px;}
+.modal-confirm{width:100%;padding:14px;border:none;border-radius:12px;background:var(--wine);color:#fff;font-family:var(--sans);font-size:15px;font-weight:500;cursor:pointer;margin-bottom:10px;}
+.modal-cancel{width:100%;padding:12px;border:none;border-radius:12px;background:transparent;color:var(--ink3);font-family:var(--sans);font-size:14px;cursor:pointer;}
+
+/* TONIGHT */
+.glow{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0;transition:opacity 1.6s ease;}
+.g1{width:320px;height:320px;background:#6c1420;top:-100px;left:-80px;opacity:0.16;}
+.g2{width:260px;height:260px;background:#1a3060;bottom:60px;right:-80px;opacity:0;}
+.g3{width:200px;height:200px;background:#1a5040;top:40%;left:15%;opacity:0;}
+.g2.on{opacity:0.11;} .g3.on{opacity:0.08;}
+.tonight-header{padding:0 26px 14px;flex-shrink:0;position:relative;z-index:10;}
+.step-progress{display:flex;align-items:center;gap:6px;margin-bottom:12px;}
+.sdot{height:3px;border-radius:2px;background:rgba(255,255,255,0.14);transition:all 0.4s ease;}
+.sdot.done{background:var(--amber);width:22px;} .sdot.active{background:var(--amber3);width:30px;} .sdot.idle{width:14px;}
+.step-lbl{font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink3);margin-left:4px;}
+.step-q{font-family:var(--serif);font-size:30px;font-weight:600;color:#fff;line-height:1.2;}
+.step-q em{color:var(--amber3);font-style:normal;}
+.step-hint{font-size:11px;color:var(--ink3);margin-top:6px;}
+.bubble-canvas{flex:1;position:relative;z-index:10;overflow:hidden;}
+.bubble{position:absolute;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-user-select:none;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,0.22) 0%,rgba(255,255,255,0.06) 45%,rgba(0,0,0,0.10) 100%);border:1px solid rgba(255,255,255,0.18);box-shadow:inset 0 1px 1px rgba(255,255,255,0.25),inset 0 -1px 2px rgba(0,0,0,0.2),0 6px 24px rgba(0,0,0,0.35),0 2px 6px rgba(0,0,0,0.2);transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.28s ease,background 0.28s ease;will-change:transform;}
+.bubble::before{content:'';position:absolute;width:35%;height:22%;top:14%;left:20%;background:rgba(255,255,255,0.28);border-radius:50%;filter:blur(3px);pointer-events:none;}
+.bubble:active{transform:scale(0.90)!important;transition-duration:0.12s!important;}
+.bubble.on{background:radial-gradient(circle at 35% 30%,rgba(240,192,112,0.55) 0%,rgba(184,113,42,0.80) 50%,rgba(140,80,20,0.90) 100%);border:1.5px solid var(--amber3);box-shadow:inset 0 1px 2px rgba(255,220,120,0.5),inset 0 -1px 3px rgba(100,50,0,0.3),0 0 0 5px rgba(184,113,42,0.20),0 8px 28px rgba(184,113,42,0.40);transform:scale(1.12) translateY(-4px);animation-play-state:paused!important;}
+.b-emoji{display:block;text-align:center;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3));}
+.b-label{display:block;text-align:center;font-family:var(--sans);font-weight:400;line-height:1.2;color:rgba(255,255,255,0.88);text-shadow:0 1px 3px rgba(0,0,0,0.5);margin-top:5px;}
+.bubble.on .b-label{color:#fff;font-weight:500;}
+@keyframes float0{0%,100%{transform:translate(0,0)}25%{transform:translate(3px,-5px)}50%{transform:translate(-2px,-8px)}75%{transform:translate(-4px,-3px)}}
+@keyframes float1{0%,100%{transform:translate(0,0)}25%{transform:translate(-4px,-6px)}50%{transform:translate(3px,-10px)}75%{transform:translate(2px,-4px)}}
+@keyframes float2{0%,100%{transform:translate(0,0)}33%{transform:translate(5px,-7px)}66%{transform:translate(-3px,-5px)}}
+@keyframes float3{0%,100%{transform:translate(0,0)}20%{transform:translate(-5px,-4px)}40%{transform:translate(4px,-9px)}60%{transform:translate(2px,-6px)}80%{transform:translate(-3px,-2px)}}
+@keyframes float4{0%,100%{transform:translate(0,0)}50%{transform:translate(6px,-8px)}}
+@keyframes float5{0%,100%{transform:translate(0,0)}30%{transform:translate(-6px,-5px)}60%{transform:translate(3px,-11px)}}
+@keyframes popIn{0%{opacity:0;transform:scale(0.4) translateY(20px)}70%{transform:scale(1.08) translateY(-4px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+.tonight-action-bar{padding:10px 20px calc(10px + var(--safe-bottom));flex-shrink:0;position:relative;z-index:10;display:flex;gap:10px;align-items:center;}
+.skip-btn{padding:14px 18px;border-radius:50px;border:0.5px solid rgba(255,255,255,0.12);background:transparent;color:rgba(255,255,255,0.35);font-family:var(--sans);font-size:13px;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.next-btn{flex:1;padding:16px;border-radius:50px;border:none;font-family:var(--serif);font-size:20px;font-weight:600;cursor:pointer;transition:all 0.25s;display:flex;align-items:center;justify-content:center;gap:8px;position:relative;overflow:hidden;}
+.next-idle{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.22);}
+.next-ready{background:linear-gradient(135deg,var(--amber),var(--amber2));color:#fff;box-shadow:0 4px 22px rgba(184,113,42,0.42);}
+.next-ready:active{transform:scale(0.97);}
+.next-count{position:absolute;right:20px;font-size:11px;font-family:var(--sans);font-weight:400;color:rgba(255,255,255,0.6);}
+.results-overlay{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;z-index:50;transform:translateY(100%);transition:transform 0.40s cubic-bezier(0.32,0.72,0,1);}
+.results-overlay.open{transform:translateY(0);}
+.res-topbar{padding-left:20px;padding-right:20px;padding-bottom:14px;padding-top:calc(var(--safe-top) + 14px);display:flex;align-items:center;gap:14px;border-bottom:0.5px solid rgba(255,255,255,0.07);flex-shrink:0;}
+.res-title{font-family:var(--serif);font-size:24px;font-weight:600;color:var(--amber2);}
+.res-sub{font-size:11px;color:var(--ink3);margin-top:1px;}
+.res-pills{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:10px 20px;flex-shrink:0;}
+.res-pills::-webkit-scrollbar{display:none;}
+.rpill{flex-shrink:0;padding:5px 13px;border-radius:20px;font-size:11px;font-weight:500;background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.13);color:rgba(255,255,255,0.65);white-space:nowrap;}
+.res-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--parch);border-radius:28px 28px 0 0;padding:14px 16px 0;}
+.res-scroll::-webkit-scrollbar{width:3px;}
+.res-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.rcard{background:#fff;border-radius:22px;border:0.5px solid var(--border);margin-bottom:12px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.06);animation:riseIn 0.3s ease both;transition:transform 0.12s;}
+.rcard:active{transform:scale(0.982);}
+@keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.rcard:nth-child(1){animation-delay:.05s}.rcard:nth-child(2){animation-delay:.12s}.rcard:nth-child(3){animation-delay:.19s}.rcard:nth-child(4){animation-delay:.26s}
+.rcard-bar{height:5px;}
+.bar-red{background:linear-gradient(90deg,#9b2335,#c23a4a)}.bar-white{background:linear-gradient(90deg,#c4970a,#e0b030)}.bar-rose{background:linear-gradient(90deg,#c9547a,#e07090)}.bar-sparkling{background:linear-gradient(90deg,#4a9e8f,#60c0b0)}.bar-dessert{background:linear-gradient(90deg,#8b5e9b,#a878be)}
+.rcard-inner{padding:14px 16px 12px;}
+.rcard-badge{display:inline-block;font-size:9px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-bottom:7px;}
+.bb{background:#faebd4;color:#b8712a}.bg{background:#e2f0ed;color:#2a6b5a}.bm{background:#f4ead8;color:#5c3d28}
+.rcard-name{font-family:var(--serif);font-size:21px;font-weight:600;color:var(--ink);margin-bottom:3px;}
+.rcard-meta{font-size:11px;color:var(--ink3);margin-bottom:10px;font-weight:300;}
+.rcard-foot{display:flex;justify-content:space-between;align-items:flex-end;}
+.rcard-tags{display:flex;flex-wrap:wrap;gap:5px;flex:1;margin-right:10px;}
+.rtag{font-size:10px;padding:3px 10px;border-radius:20px;font-weight:500;white-space:nowrap;}
+.rtag.lit{box-shadow:0 0 0 1.5px rgba(184,113,42,0.4);}
+.qty-ring{width:48px;height:48px;border-radius:50%;background:#ede0cc;border:1.5px solid rgba(120,80,40,0.18);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
+.qty-ring-n{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink);line-height:1;}
+.qty-ring-l{font-size:7px;color:var(--ink3);letter-spacing:0.06em;text-transform:uppercase;}
+.rcard-aux{display:flex;flex-direction:column;align-items:flex-end;gap:3px;margin-left:8px;}
+.rcard-stars{font-size:10px;color:var(--amber);letter-spacing:1px;}
+.rcard-price{font-family:var(--serif);font-size:12px;color:var(--ink3);}
+.csep{display:flex;align-items:center;gap:10px;padding:8px 0 10px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);}
+.csep::before,.csep::after{content:'';flex:1;height:0.5px;background:rgba(120,80,40,0.2);}
+.ccard{background:rgba(255,255,255,0.5);border-radius:18px;border:0.5px dashed rgba(120,80,40,0.22);padding:12px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+.ccard-name{font-family:var(--serif);font-size:16px;color:var(--ink3);}
+.ccard-meta{font-size:11px;color:var(--ink4);margin-top:2px;}
+.restock-pill{padding:7px 14px;border-radius:20px;background:#faebd4;border:0.5px solid rgba(184,113,42,0.3);font-family:var(--sans);font-size:11px;font-weight:500;color:var(--amber);cursor:pointer;white-space:nowrap;}
+.no-res{display:flex;flex-direction:column;align-items:center;padding:48px 24px;text-align:center;gap:12px;}
+.no-res-i{font-size:48px;opacity:0.25;}.no-res-t{font-family:var(--serif);font-size:24px;color:var(--ink2);}.no-res-s{font-size:13px;color:var(--ink3);line-height:1.6;max-width:240px;}
+.scroll-end{height:24px;}
+
+/* ════ SETTINGS SCREEN ════ */
+.settings-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:20px;}
+.settings-scroll::-webkit-scrollbar{width:3px;}
+.settings-hero{padding:28px 24px 20px;text-align:center;}
+.settings-hero-title{font-family:var(--serif);font-size:34px;font-weight:600;color:var(--amber2);margin-bottom:4px;}
+.settings-hero-sub{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink3);}
+.settings-section{margin:0 16px 14px;}
+.settings-section-title{font-size:9px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink3);padding:0 4px 10px;}
+/* Theme cards grid */
+.theme-grid{display:grid;grid-template-columns:1fr;gap:12px;}
+.theme-card{border-radius:22px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all 0.25s cubic-bezier(0.34,1.2,0.64,1);position:relative;}
+.theme-card.on{border-color:var(--amber2);box-shadow:0 0 0 4px rgba(184,113,42,0.2),0 8px 32px rgba(0,0,0,0.2);}
+.theme-card:active{transform:scale(0.97);}
+.theme-preview{height:160px;position:relative;overflow:hidden;}
+/* Classic preview */
+.tp-classic{background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(80,20,10,0.8) 0%,transparent 70%),radial-gradient(ellipse 100% 100% at 50% 50%,#1a0d05 0%,#110804 100%);}
+/* Tekapo preview */
+.tp-tekapo{
+  background:
+    radial-gradient(ellipse 120% 25% at 30% 18%,rgba(0,200,120,0.2) 0%,transparent 60%),
+    radial-gradient(ellipse 80% 20% at 70% 12%,rgba(80,0,200,0.15) 0%,transparent 55%),
+    radial-gradient(1.5px 1.5px at 20% 10%,rgba(255,255,255,1) 0%,transparent 2px),
+    radial-gradient(1px 1px at 60% 7%,rgba(255,255,255,0.9) 0%,transparent 1px),
+    radial-gradient(1.5px 1.5px at 85% 5%,rgba(255,255,255,0.95) 0%,transparent 2px),
+    radial-gradient(1px 1px at 42% 15%,rgba(255,255,255,0.7) 0%,transparent 1px),
+    radial-gradient(1px 1px at 75% 20%,rgba(255,255,255,0.6) 0%,transparent 1px),
+    radial-gradient(1px 1px at 10% 22%,rgba(255,255,255,0.8) 0%,transparent 1px),
+    linear-gradient(180deg,#030510 0%,#060a1a 30%,#0a1230 50%,#08102a 55%,#080e24 65%,#060a1c 100%);
+}
+.tp-tekapo::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 30%,rgba(6,10,28,0.95) 50%,rgba(5,8,20,1) 60%,rgba(10,16,36,0.95) 65%,rgba(8,14,32,0.9) 100%);
+  clip-path:polygon(0% 100%,0% 50%,10% 38%,18% 44%,26% 32%,35% 42%,46% 34%,55% 42%,65% 33%,75% 43%,85% 36%,94% 44%,100% 40%,100% 100%);}
+/* Zermatt preview */
+.tp-zermatt{
+  background:
+    radial-gradient(ellipse 40% 30% at 75% 20%,rgba(255,220,120,0.4) 0%,transparent 60%),
+    radial-gradient(ellipse 120% 20% at 50% 50%,rgba(255,245,230,0.5) 0%,transparent 70%),
+    linear-gradient(180deg,#b0c8e0 0%,#d0c0a8 18%,#e8d8c0 28%,#f0e4cc 38%,#f5ede0 50%,#f0e8dc 70%,#e8e0d4 100%);
+}
+.tp-zermatt::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(180,170,158,0.6) 0%,rgba(200,188,172,0.4) 40%,transparent 70%);
+  clip-path:polygon(0% 100%,0% 75%,8% 68%,15% 72%,22% 58%,28% 63%,36% 46%,42% 40%,47% 45%,52% 32%,57% 40%,63% 48%,70% 52%,78% 43%,86% 55%,94% 62%,100% 66%,100% 100%);}
+.theme-card-info{background:var(--card);padding:14px 18px 16px;}
+.theme-card-name{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--ink);margin-bottom:3px;display:flex;align-items:center;justify-content:space-between;}
+.theme-check{width:22px;height:22px;border-radius:50%;background:var(--amber);display:none;align-items:center;justify-content:center;font-size:12px;color:#fff;flex-shrink:0;}
+.theme-card.on .theme-check{display:flex;}
+.theme-card-desc{font-size:12px;color:var(--ink3);line-height:1.5;}
+.theme-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.theme-tag{font-size:10px;padding:3px 10px;border-radius:10px;font-weight:500;}
+/* Settings info rows */
+.settings-card{background:var(--card);border-radius:18px;border:0.5px solid var(--border);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.05);}
+.settings-row{padding:14px 18px;border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.settings-row:last-child{border-bottom:none;}
+.settings-row-left{display:flex;flex-direction:column;gap:2px;}
+.settings-row-key{font-size:14px;color:var(--ink);font-weight:500;}
+.settings-row-sub{font-size:11px;color:var(--ink3);}
+.settings-row-val{font-family:var(--serif);font-size:14px;color:var(--amber);font-weight:600;}
+.version-footer{text-align:center;padding:20px;font-size:11px;color:var(--ink4);letter-spacing:0.06em;}
+
+/* ════ LOGIN SCREEN ════ */
+#s-login{justify-content:center;align-items:center;}
+/* Login always uses Tekapo starry sky regardless of theme */
+#s-login::before{
+  opacity:1;
+  background:
+    /* Aurora wisps */
+    radial-gradient(ellipse 140% 22% at 25% 14%, rgba(0,220,130,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 90% 18% at 72% 9%, rgba(100,0,220,0.14) 0%, transparent 55%),
+    radial-gradient(ellipse 110% 14% at 50% 20%, rgba(0,170,220,0.11) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 10% at 38% 28%, rgba(0,200,150,0.08) 0%, transparent 45%),
+    /* Stars — scattered across the sky */
+    radial-gradient(1.5px 1.5px at 8%  6%,  rgba(255,255,255,1.0) 0%, transparent 2px),
+    radial-gradient(1px   1px   at 18% 4%,  rgba(255,255,255,0.8) 0%, transparent 1px),
+    radial-gradient(2px   2px   at 28% 9%,  rgba(255,255,255,0.9) 0%, transparent 2px),
+    radial-gradient(1px   1px   at 38% 3%,  rgba(255,255,255,0.7) 0%, transparent 1px),
+    radial-gradient(1.5px 1.5px at 50% 7%,  rgba(255,255,255,1.0) 0%, transparent 2px),
+    radial-gradient(1px   1px   at 60% 4%,  rgba(255,255,255,0.6) 0%, transparent 1px),
+    radial-gradient(1px   1px   at 70% 10%, rgba(255,255,255,0.9) 0%, transparent 1px),
+    radial-gradient(2px   2px   at 80% 5%,  rgba(255,255,255,0.8) 0%, transparent 2px),
+    radial-gradient(1px   1px   at 90% 8%,  rgba(255,255,255,0.7) 0%, transparent 1px),
+    radial-gradient(1px   1px   at 95% 3%,  rgba(255,255,255,0.9) 0%, transparent 1px),
+    radial-gradient(1px   1px   at 13% 15%, rgba(255,255,255,0.6) 0%, transparent 1px),
+    radial-gradient(1px   1px   at 45% 18%, rgba(220,235,255,0.7) 0%, transparent 1px),
+    radial-gradient(1.5px 1.5px at 65% 13%, rgba(255,255,255,0.8) 0%, transparent 2px),
+    radial-gradient(1px   1px   at 82% 19%, rgba(255,255,255,0.5) 0%, transparent 1px),
+    radial-gradient(1px   1px   at 33% 22%, rgba(255,255,255,0.6) 0%, transparent 1px),
+    radial-gradient(1px   1px   at 55% 25%, rgba(220,230,255,0.5) 0%, transparent 1px),
+    radial-gradient(1px   1px   at 75% 23%, rgba(255,255,255,0.7) 0%, transparent 1px),
+    radial-gradient(1px   1px   at 92% 17%, rgba(255,255,255,0.6) 0%, transparent 1px),
+    radial-gradient(1px   1px   at 5%  28%, rgba(255,255,255,0.5) 0%, transparent 1px),
+    /* Mountain silhouette reflecting in still lake */
+    linear-gradient(180deg,
+      transparent 0%,
+      transparent 30%,
+      #04060f 30.5%,
+      #030508 38%,
+      /* Lake surface — mirror of sky */
+      #05091a 48%,
+      #060b1e 55%,
+      #070d22 65%,
+      #060a1c 80%,
+      #04070f 100%
+    ),
+    /* Deep night sky */
+    linear-gradient(180deg,
+      #010208 0%,
+      #020410 10%,
+      #030818 22%,
+      #040a20 35%,
+      #050c26 48%
+    );
+}
+/* Mountain peaks clip for login */
+#s-login::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:linear-gradient(180deg,rgba(4,6,16,0.9) 0%,rgba(3,5,12,0.95) 40%,transparent 60%);
+  clip-path:polygon(0% 100%,0% 40%,6% 32%,10% 36%,15% 26%,20% 32%,26% 20%,31% 28%,37% 16%,42% 12%,47% 18%,52% 10%,57% 16%,62% 24%,68% 18%,74% 28%,80% 22%,86% 32%,92% 26%,97% 34%,100% 30%,100% 100%);
+  opacity:0.9;
+}
+/* Reflection shimmer line at lake surface */
+#s-login .login-card{position:relative;z-index:2;}
+.login-card{width:100%;max-width:360px;margin:0 auto;padding:0 28px;}
+.login-logo{text-align:center;margin-bottom:6px;}
+.login-title{font-family:var(--serif);font-size:38px;font-weight:600;color:#a0bef0;text-align:center;line-height:1;letter-spacing:-0.01em;}
+.login-sub{font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(160,190,240,0.55);text-align:center;margin-top:6px;margin-bottom:40px;}
+.login-field{margin-bottom:14px;}
+.login-lbl{font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:6px;display:block;}
+.login-input{width:100%;padding:14px 16px;background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.18);border-radius:14px;font-family:var(--sans);font-size:15px;color:rgba(255,255,255,0.9);outline:none;transition:border-color 0.2s;}
+.login-input::placeholder{color:rgba(255,255,255,0.25);}
+.login-input:focus{border-color:rgba(184,113,42,0.6);background:rgba(255,255,255,0.10);}
+/* Login inputs always dark — login screen is always the starry night */
+[data-theme="zermatt"] .login-input{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.18);color:rgba(255,255,255,0.9);}
+[data-theme="zermatt"] .login-input::placeholder{color:rgba(255,255,255,0.25);}
+[data-theme="zermatt"] .login-input:focus{border-color:rgba(184,113,42,0.6);}
+[data-theme="zermatt"] #s-login .login-lbl{color:rgba(255,255,255,0.45);}
+[data-theme="zermatt"] #s-login .login-toggle{color:rgba(255,255,255,0.35);}
+.login-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--amber),var(--amber2));border:none;border-radius:14px;font-family:var(--serif);font-size:20px;font-weight:600;color:#fff;cursor:pointer;margin-top:6px;transition:all 0.2s;position:relative;overflow:hidden;}
+.login-btn:active{transform:scale(0.98);}
+.login-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+.login-toggle{text-align:center;margin-top:20px;font-size:13px;color:rgba(255,255,255,0.35);}
+.login-toggle a{color:var(--amber2);cursor:pointer;text-decoration:none;font-weight:500;}
+.login-err{background:rgba(124,34,48,0.15);border:0.5px solid rgba(124,34,48,0.3);border-radius:10px;padding:10px 14px;font-size:12px;color:#e07080;margin-bottom:14px;display:none;}
+.login-err.show{display:block;}
+.login-magic{text-align:center;margin-top:16px;}
+.login-magic a{font-size:12px;color:rgba(255,255,255,0.3);cursor:pointer;text-decoration:underline;}
+.login-success{text-align:center;padding:20px;display:none;}
+.login-success.show{display:block;}
+.login-success-icon{font-size:48px;margin-bottom:12px;}
+.login-success-title{font-family:var(--serif);font-size:24px;color:var(--amber3);margin-bottom:8px;}
+.login-success-sub{font-size:13px;color:rgba(255,255,255,0.45);line-height:1.6;}
+/* User pill in header */
+.user-pill{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.14);border-radius:20px;padding:5px 12px 5px 8px;cursor:pointer;}
+.user-avatar{width:22px;height:22px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0;}
+.user-email{font-size:11px;color:rgba(255,255,255,0.7);max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+[data-theme="zermatt"] .user-email{color:var(--ink2);}
+/* Loading overlay */
+.db-loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:400;transition:opacity 0.4s;}
+.db-loading.done{opacity:0;pointer-events:none;}
+.db-spinner{width:44px;height:44px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--amber2);border-radius:50%;animation:spin 0.8s linear infinite;}
+.db-loading-msg{font-family:var(--serif);font-size:18px;color:var(--amber2);}
+
+/* ════ WINE SEARCH ════ */
+.wine-search-wrap{margin:14px 16px 0;position:relative;}
+.wine-search-input{width:100%;padding:16px 48px 16px 20px;background:var(--card);border:1.5px solid var(--border2);border-radius:16px;font-family:var(--serif);font-size:18px;color:var(--ink);outline:none;box-shadow:0 2px 12px rgba(0,0,0,0.06);transition:border-color 0.2s,box-shadow 0.2s;}
+.wine-search-input::placeholder{color:var(--ink4);font-style:italic;font-size:16px;font-family:var(--sans);}
+.wine-search-input:focus{border-color:var(--amber);box-shadow:0 2px 20px rgba(184,113,42,0.15);}
+.wine-search-spinner{position:absolute;right:16px;top:50%;transform:translateY(-50%);width:20px;height:20px;border:2px solid rgba(184,113,42,0.2);border-top-color:var(--amber);border-radius:50%;animation:spin 0.7s linear infinite;display:none;}
+.wine-search-spinner.on{display:block;}
+.wine-search-hint{font-size:11px;color:var(--ink3);margin:7px 4px 0;display:flex;align-items:center;gap:5px;}
+
+/* Search result card */
+.wine-result-card{margin:10px 16px 0;background:var(--card);border-radius:18px;border:1.5px solid var(--amber);overflow:hidden;box-shadow:0 4px 20px rgba(184,113,42,0.15);display:none;animation:riseIn 0.25s ease;}
+.wine-result-card.show{display:block;}
+.wine-result-header{padding:14px 16px 10px;background:linear-gradient(135deg,rgba(184,113,42,0.08),rgba(212,146,74,0.05));border-bottom:0.5px solid var(--border);}
+.wine-result-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--amber);margin-bottom:6px;}
+.wine-result-name{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);line-height:1.15;margin-bottom:3px;}
+.wine-result-producer{font-size:12px;color:var(--ink3);margin-bottom:10px;}
+.wine-result-pills{display:flex;gap:6px;flex-wrap:wrap;}
+.wine-result-pill{font-size:10px;font-weight:500;padding:3px 10px;border-radius:10px;}
+.wine-result-body{padding:12px 16px;}
+.wine-result-rows{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.wine-result-row{display:flex;flex-direction:column;gap:2px;}
+.wine-result-key{font-size:9px;font-weight:500;letter-spacing:0.10em;text-transform:uppercase;color:var(--ink3);}
+.wine-result-val{font-family:var(--serif);font-size:15px;color:var(--ink);font-weight:500;}
+.wine-result-val.empty{font-family:var(--sans);font-size:12px;color:var(--ink4);font-style:italic;font-weight:300;}
+.wine-result-flavours{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;}
+.wine-result-confirm{width:100%;padding:13px;background:var(--amber);border:none;border-radius:12px;font-family:var(--serif);font-size:18px;font-weight:600;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.15s;}
+.wine-result-confirm:active{background:var(--amber2);transform:scale(0.98);}
+.wine-result-manual{text-align:center;margin-top:10px;font-size:12px;color:var(--ink3);}
+.wine-result-manual a{color:var(--amber);cursor:pointer;font-weight:500;}
+.wine-search-error{margin:10px 16px 0;padding:11px 14px;background:rgba(124,34,48,0.08);border:0.5px solid rgba(124,34,48,0.2);border-radius:12px;font-size:12px;color:var(--wine);display:none;}
+.wine-search-error.show{display:block;}
+/* Divider between search and manual form */
+.add-divider{margin:18px 16px 0;display:flex;align-items:center;gap:10px;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3);}
+.add-divider::before,.add-divider::after{content:'';flex:1;height:0.5px;background:var(--border2);}
+</style>
+</head>
+<body>
+
+<!-- DB LOADING OVERLAY -->
+<div class="db-loading" id="db-loading">
+  <div style="font-size:44px;">🍷</div>
+  <div class="db-spinner"></div>
+  <div class="db-loading-msg">Opening your cellar…</div>
+</div>
+
+<!-- SCREEN 0: LOGIN -->
+<div class="screen hidden" id="s-login">
+  <div class="login-card">
+    <div class="login-logo">
+      <div style="font-size:72px;line-height:1;filter:drop-shadow(0 4px 28px rgba(100,150,255,0.5));margin-bottom:4px;">🍷</div>
+    </div>
+    <div class="login-title">My Cellar</div>
+    <div class="login-sub">Your personal wine journal</div>
+
+    <!-- Sign in form -->
+    <div id="login-form-wrap">
+      <div class="login-err" id="login-err"></div>
+      <div class="login-field">
+        <label class="login-lbl" for="login-email">Email</label>
+        <input class="login-input" id="login-email" type="email" placeholder="you@example.com" autocomplete="email"/>
+      </div>
+      <div class="login-field" id="login-pw-wrap">
+        <label class="login-lbl" for="login-pw">Password</label>
+        <input class="login-input" id="login-pw" type="password" placeholder="Your password" autocomplete="current-password"/>
+      </div>
+      <button class="login-btn" id="login-btn" onclick="handleLogin()">Sign in</button>
+      <div class="login-toggle" id="login-toggle-txt">
+        No account yet? <a onclick="toggleLoginMode()">Create one</a>
+      </div>
+      <div class="login-magic">
+        <a onclick="sendMagicLink()">Sign in by email link instead →</a>
+      </div>
+    </div>
+
+    <!-- Magic link sent state -->
+    <div class="login-success" id="login-magic-sent">
+      <div class="login-success-icon">📬</div>
+      <div class="login-success-title">Check your email</div>
+      <div class="login-success-sub">We sent a sign-in link to <strong id="magic-email-sent"></strong>.<br>Tap it to sign in instantly — no password needed.</div>
+    </div>
+  </div>
+</div>
+<!-- SCREEN 5: SETTINGS -->
+<div class="screen hidden" id="s-settings">
+  <div class="statusbar"><span class="sb-time" id="clock5">9:41</span><div class="sb-icons"><span>▲▲▲</span><span>WiFi</span><span>🔋</span></div></div>
+  <div class="settings-scroll">
+    <div class="settings-hero">
+      <div class="settings-hero-title">Settings</div>
+      <div class="settings-hero-sub">Personalise your cellar</div>
+    </div>
+
+    <!-- Theme picker -->
+    <div class="settings-section">
+      <div class="settings-section-title">🎨 Appearance</div>
+      <div class="theme-grid">
+
+        <div class="theme-card on" id="tc-classic" onclick="applyTheme('classic')">
+          <div class="theme-preview tp-classic"></div>
+          <div class="theme-card-info">
+            <div class="theme-card-name">Cellar Classic
+              <div class="theme-check">✓</div>
+            </div>
+            <div class="theme-card-desc">Deep oak and candlelight. The original cellar aesthetic — warm, rich, timeless.</div>
+            <div class="theme-tags">
+              <span class="theme-tag" style="background:#3a1a08;color:#d4924a;">Dark</span>
+              <span class="theme-tag" style="background:#4a2510;color:#f0c070;">Warm</span>
+              <span class="theme-tag" style="background:#2a1005;color:#9c7a60;">Classic</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="theme-card" id="tc-tekapo" onclick="applyTheme('tekapo')">
+          <div class="theme-preview tp-tekapo"></div>
+          <div class="theme-card-info">
+            <div class="theme-card-name">Lake Tekapo
+              <div class="theme-check">✓</div>
+            </div>
+            <div class="theme-card-desc">New Zealand's famous dark-sky reserve. Milky Way reflected in still glacial water. Aurora on the horizon.</div>
+            <div class="theme-tags">
+              <span class="theme-tag" style="background:#0a1230;color:#a0bef0;">Dark</span>
+              <span class="theme-tag" style="background:#0d1828;color:#7c9fe0;">Midnight</span>
+              <span class="theme-tag" style="background:#081020;color:#c8dcff;">Starry</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="theme-card" id="tc-zermatt" onclick="applyTheme('zermatt')">
+          <div class="theme-preview tp-zermatt"></div>
+          <div class="theme-card-info">
+            <div class="theme-card-name">Zermatt Morning
+              <div class="theme-check">✓</div>
+            </div>
+            <div class="theme-card-desc">First light over the Matterhorn. Alpine mist, golden dawn, crisp mountain air. Calm and luminous.</div>
+            <div class="theme-tags">
+              <span class="theme-tag" style="background:#e8dcc8;color:#7a6550;">Light</span>
+              <span class="theme-tag" style="background:#f0e4cc;color:#c07828;">Golden</span>
+              <span class="theme-tag" style="background:#e0d8c8;color:#3d3020;">Alpine</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Cellar stats -->
+    <div class="settings-section">
+      <div class="settings-section-title">📊 Your cellar</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <div class="settings-row-left"><div class="settings-row-key">Total bottles</div><div class="settings-row-sub">Across all wines in cellar</div></div>
+          <div class="settings-row-val" id="set-bottles">—</div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-left"><div class="settings-row-key">Unique wines</div><div class="settings-row-sub">Different labels tracked</div></div>
+          <div class="settings-row-val" id="set-wines">—</div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-left"><div class="settings-row-key">Tastings logged</div><div class="settings-row-sub">Across all bottles</div></div>
+          <div class="settings-row-val" id="set-tastings">—</div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-left"><div class="settings-row-key">Total value</div><div class="settings-row-sub">Estimated cellar worth</div></div>
+          <div class="settings-row-val" id="set-value">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- About -->
+    <div class="settings-section">
+      <div class="settings-section-title">ℹ️ About</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <div class="settings-row-left"><div class="settings-row-key">My Cellar</div><div class="settings-row-sub">Your personal wine journal</div></div>
+          <div class="settings-row-val">v1.0</div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-left"><div class="settings-row-key">Data storage</div><div class="settings-row-sub">Saved locally on this device</div></div>
+          <div class="settings-row-val" style="font-size:11px;color:var(--teal);">On device</div>
+        </div>
+        <div class="settings-row" style="cursor:pointer;" onclick="exportData()">
+          <div class="settings-row-left"><div class="settings-row-key">Export my data</div><div class="settings-row-sub">Download all wines as JSON</div></div>
+          <div class="settings-row-val">↓</div>
+        </div>
+        <div class="settings-row" style="cursor:pointer;" onclick="handleSignOut()">
+          <div class="settings-row-left"><div class="settings-row-key" style="color:var(--wine);">Sign out</div><div class="settings-row-sub" id="set-email"></div></div>
+          <div class="settings-row-val" style="color:var(--wine);">→</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="version-footer">Made with 🍷 · My Cellar 1.0</div>
+  </div>
+  <div class="bnav">
+    <button class="ni" onclick="setNav(0)"><span class="ni-icon">🍾</span><span class="ni-lbl">Cellar</span></button>
+    <button class="ni" onclick="setNav(1)"><span class="ni-icon">🌙</span><span class="ni-lbl">Tonight</span></button>
+    <button class="ni" onclick="openAddScreen()"><span class="ni-icon">＋</span><span class="ni-lbl">Add</span></button>
+    <button class="ni on"><span class="ni-icon">⚙️</span><span class="ni-lbl">Settings</span></button>
+  </div>
+</div>
+<!-- Scan overlay -->
+<div class="scan-overlay" id="scan-overlay">
+  <img class="scan-preview-img" id="scan-preview-img" alt="" style="display:none;"/>
+  <div class="scan-spinner" id="scan-spinner"></div>
+  <div class="scan-msg" id="scan-msg">Reading label…</div>
+  <div class="scan-sub" id="scan-sub">Claude is identifying the wine — just a moment</div>
+  <button class="scan-cancel" onclick="cancelScan()">Cancel</button>
+</div>
+<!-- Ambient glows -->
+<div class="glow g1"></div>
+<div class="glow g2" id="g2"></div>
+<div class="glow g3" id="g3"></div>
+<div class="toast-el" id="toast"></div>
+<!-- Delete modal -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Remove this wine?</div>
+    <div class="modal-sub" id="delete-modal-sub">This will permanently remove the wine from your cellar.</div>
+    <button class="modal-confirm" id="delete-confirm-btn">Yes, remove it</button>
+    <button class="modal-cancel" onclick="closeDeleteModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- SCREEN 1: MY CELLAR -->
+<div class="screen active" id="s-cellar">
+  <div class="statusbar"><span class="sb-time" id="clock1">9:41</span><div class="sb-icons"><span>▲▲▲</span><span>WiFi</span><span>🔋</span></div></div>
+  <div class="cellar-header">
+    <div class="cellar-title-row">
+      <div><div class="cellar-title">My Cellar</div><div class="cellar-sub">Personal wine journal</div></div>
+      <div class="header-actions" style="flex-direction:column;align-items:flex-end;gap:6px;">
+        <div class="user-pill" id="user-pill" onclick="setNav(3)">
+          <div class="user-avatar" id="user-avatar">?</div>
+          <div class="user-email" id="user-email-display">loading…</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="icon-btn" onclick="cycleSortMode()">↕</button>
+          <button class="icon-btn add-fab" onclick="openAddScreen()">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="stats-strip">
+    <div class="stat-item"><div class="stat-num" id="s-bottles">0</div><div class="stat-lbl">Bottles</div></div>
+    <div class="stat-item"><div class="stat-num" id="s-wines">0</div><div class="stat-lbl">Wines</div></div>
+    <div class="stat-item"><div class="stat-num" id="s-rating">—</div><div class="stat-lbl">Avg rating</div></div>
+  </div>
+  <div class="filter-row" id="filter-row">
+    <button class="fpill on" data-filter="all">All</button>
+    <button class="fpill" data-filter="red">Red</button>
+    <button class="fpill" data-filter="white">White</button>
+    <button class="fpill" data-filter="rose">Rosé</button>
+    <button class="fpill" data-filter="sparkling">Sparkling</button>
+    <button class="fpill" data-filter="dessert">Dessert</button>
+    <button class="fpill" data-filter="consumed">Consumed</button>
+  </div>
+  <div class="search-wrap"><div class="search-inner"><span class="search-icon">🔍</span><input class="search-bar" type="search" placeholder="Search wine, producer, country…" id="search-input" autocomplete="off"/></div></div>
+  <div class="wine-list-wrap">
+    <div class="list-header"><span class="list-count" id="list-count">Loading…</span><button class="sort-btn" id="sort-lbl" onclick="cycleSortMode()">Newest first ↓</button></div>
+    <div class="wine-list" id="wine-list"></div>
+  </div>
+  <div class="bnav">
+    <button class="ni on" onclick="setNav(0)"><span class="ni-icon">🍾</span><span class="ni-lbl">Cellar</span></button>
+    <button class="ni" onclick="setNav(1)"><span class="ni-icon">🌙</span><span class="ni-lbl">Tonight</span></button>
+    <button class="ni" onclick="openAddScreen()"><span class="ni-icon">＋</span><span class="ni-lbl">Add</span></button>
+    <button class="ni" onclick="setNav(3)"><span class="ni-icon">⚙️</span><span class="ni-lbl">Settings</span></button>
+  </div>
+</div>
+
+<!-- SCREEN 2: ADD A WINE -->
+<div class="screen hidden" id="s-add">
+  <div class="statusbar"><span class="sb-time" id="clock2">9:41</span><div class="sb-icons"><span>▲▲▲</span><span>WiFi</span><span>🔋</span></div></div>
+  <div class="add-topbar">
+    <button class="back-btn" onclick="goBack()">←</button>
+    <div><div class="add-title">Add a wine</div><div class="add-sub">Fill in what you know</div></div>
+  </div>
+  <div class="form-scroll" id="add-form-scroll">
+
+    <!-- ── Wine Search ── -->
+    <div class="wine-search-wrap">
+      <input class="wine-search-input" id="wine-search-input" type="text"
+        placeholder="Start typing a wine name…" autocomplete="off"
+        oninput="handleWineSearch(this.value)"/>
+      <div class="wine-search-spinner" id="wine-search-spinner"></div>
+    </div>
+    <div class="wine-search-hint">
+      <span>✦</span> Type any wine name — we'll look it up instantly
+    </div>
+
+    <!-- Search result card -->
+    <div class="wine-result-card" id="wine-result-card">
+      <div class="wine-result-header">
+        <div class="wine-result-badge">✦ Found a match</div>
+        <div class="wine-result-name" id="wr-name"></div>
+        <div class="wine-result-producer" id="wr-producer"></div>
+        <div class="wine-result-pills" id="wr-pills"></div>
+      </div>
+      <div class="wine-result-body">
+        <div class="wine-result-rows">
+          <div class="wine-result-row"><div class="wine-result-key">Country</div><div class="wine-result-val" id="wr-country"></div></div>
+          <div class="wine-result-row"><div class="wine-result-key">Region</div><div class="wine-result-val" id="wr-region"></div></div>
+          <div class="wine-result-row"><div class="wine-result-key">Grape</div><div class="wine-result-val" id="wr-grape"></div></div>
+          <div class="wine-result-row"><div class="wine-result-key">Style</div><div class="wine-result-val" id="wr-type"></div></div>
+        </div>
+        <div class="wine-result-flavours" id="wr-flavours"></div>
+        <button class="wine-result-confirm" onclick="confirmWineResult()">
+          <span>＋</span> Add this wine to my cellar
+        </button>
+        <div class="wine-result-manual">
+          Not quite right? <a onclick="editWineResult()">Edit details</a> or <a onclick="clearWineSearch()">search again</a>
+        </div>
+      </div>
+    </div>
+    <div class="wine-search-error" id="wine-search-error"></div>
+
+    <div class="add-divider">or fill in manually</div>
+
+    <div class="photo-btns">
+      <div class="photo-btn scan-btn" onclick="startScan()">
+        <div class="photo-btn-icon">🔍</div>
+        <div class="photo-btn-lbl"><strong>Scan label</strong><br>Auto-fill details with AI</div>
+      </div>
+      <div class="photo-btn" onclick="document.getElementById('photo-input').click()">
+        <div class="photo-btn-icon">📸</div>
+        <div class="photo-btn-lbl">Photo only<br>Fill in details yourself</div>
+      </div>
+    </div>
+    <div class="photo-preview-wrap" id="photo-preview-wrap">
+      <img class="photo-preview" id="photo-preview" alt="Label" style="width:100%;max-height:160px;object-fit:cover;border-radius:12px;"/>
+    </div>
+    <div class="scan-filled" id="scan-filled"><span>✨</span><span id="scan-filled-msg">Label scanned — fields filled below</span></div>
+    <input type="file" id="photo-input" accept="image/*" capture="environment" onchange="handlePhoto(this)" style="display:none"/>
+    <input type="file" id="scan-input" accept="image/*" capture="environment" onchange="handleScanPhoto(this)" style="display:none"/>
+    <div class="form-section">
+      <div class="section-title"><span>🍾</span> About this wine</div>
+      <div class="field"><div class="flbl">Wine name & producer</div><input class="finput" id="f-name" type="text" placeholder="e.g. Château Margaux" autocomplete="off"/></div>
+      <div class="field-row">
+        <div class="field"><div class="flbl">Vintage year</div><input class="finput" id="f-vintage" type="number" placeholder="e.g. 2019" inputmode="numeric"/></div>
+        <div class="field"><div class="flbl">Wine type</div><select class="fselect" id="f-type"><option value="">Select…</option><option value="red">Red</option><option value="white">White</option><option value="rose">Rosé</option><option value="sparkling">Sparkling</option><option value="dessert">Dessert</option></select></div>
+      </div>
+      <div class="field"><div class="flbl">Country</div><input class="finput" id="f-country" type="text" placeholder="e.g. France" autocomplete="off"/></div>
+      <div class="field"><div class="flbl">Region</div><input class="finput" id="f-region" type="text" placeholder="e.g. Bordeaux" autocomplete="off"/></div>
+      <div class="field-row">
+        <div class="field"><div class="flbl">Price paid (RM)</div><input class="finput" id="f-price" type="number" placeholder="e.g. 150" inputmode="decimal"/></div>
+        <div class="field"><div class="flbl">Bottles owned</div><div style="display:flex;align-items:center;gap:8px;padding-top:4px;"><button class="qty-big-btn" onclick="changeAddQty(-1)" style="width:32px;height:32px;font-size:18px;">−</button><span class="qty-big-num" id="add-qty-display" style="font-size:24px;padding:0 8px;">1</span><button class="qty-big-btn" onclick="changeAddQty(1)" style="width:32px;height:32px;font-size:18px;">+</button></div></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="section-title"><span>🍇</span> Grape variety</div>
+      <div class="grape-scroll" id="grape-scroll">
+        <div class="grape-chip" data-grape="Cabernet Sauvignon" onclick="pickGrape(this)">Cabernet Sauvignon</div>
+        <div class="grape-chip" data-grape="Merlot" onclick="pickGrape(this)">Merlot</div>
+        <div class="grape-chip" data-grape="Pinot Noir" onclick="pickGrape(this)">Pinot Noir</div>
+        <div class="grape-chip" data-grape="Syrah / Shiraz" onclick="pickGrape(this)">Syrah / Shiraz</div>
+        <div class="grape-chip" data-grape="Chardonnay" onclick="pickGrape(this)">Chardonnay</div>
+        <div class="grape-chip" data-grape="Sauvignon Blanc" onclick="pickGrape(this)">Sauvignon Blanc</div>
+        <div class="grape-chip" data-grape="Riesling" onclick="pickGrape(this)">Riesling</div>
+        <div class="grape-chip" data-grape="Grenache" onclick="pickGrape(this)">Grenache</div>
+        <div class="grape-chip" data-grape="Tempranillo" onclick="pickGrape(this)">Tempranillo</div>
+        <div class="grape-chip" data-grape="Champagne blend" onclick="pickGrape(this)">Champagne blend</div>
+        <div class="grape-chip" data-grape="Pinot Grigio" onclick="pickGrape(this)">Pinot Grigio</div>
+        <div class="grape-chip" data-grape="Rosé blend" onclick="pickGrape(this)">Rosé blend</div>
+        <div class="grape-chip" data-grape="Dessert blend" onclick="pickGrape(this)">Dessert blend</div>
+        <div class="grape-chip" data-grape="Other" onclick="pickGrape(this)">Other</div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="section-title"><span>👅</span> Flavour profile</div>
+      <div class="suggest-banner" id="suggest-banner">Suggested for <strong id="suggest-grape-name"></strong> — tap to deselect any that don't fit</div>
+      <div class="ftags-wrap" id="flavour-suggested"></div>
+      <div style="padding:0 16px 14px;"><button class="ftag-more" onclick="toggleAllFlavours()"><span id="more-icon">＋</span> <span id="more-txt">Add more flavours</span></button></div>
+      <div class="all-flavours" id="all-flavours"></div>
+      <button class="collapse-btn" id="collapse-flavours" onclick="toggleAllFlavours()">Hide flavours ↑</button>
+      <div id="no-flavour-msg" style="padding:14px 16px;font-size:12px;color:var(--ink3);font-style:italic;">Choose a grape above to get suggested flavours</div>
+    </div>
+    <div class="form-section">
+      <div class="section-title"><span>🍽️</span> Food pairing</div>
+      <div class="suggest-banner" id="food-suggest-banner">Suggested for <strong id="food-suggest-grape"></strong></div>
+      <div class="ftags-wrap" id="food-suggested"></div>
+      <div style="padding:0 16px 14px;"><button class="ftag-more" onclick="toggleAllFood()"><span id="food-more-icon">＋</span> <span id="food-more-txt">Add more pairings</span></button></div>
+      <div class="all-flavours" id="all-food"></div>
+      <button class="collapse-btn" id="collapse-food" onclick="toggleAllFood()">Hide pairings ↑</button>
+      <div id="no-food-msg" style="padding:14px 16px;font-size:12px;color:var(--ink3);font-style:italic;">Choose a grape above to get suggested pairings</div>
+    </div>
+    <div class="form-section">
+      <div class="section-title"><span>⭐</span> Your rating <span style="font-size:9px;font-weight:300;color:var(--ink4);margin-left:4px;">tap once = full · tap again = half</span></div>
+      <div class="star-row" id="star-row-add"></div>
+      <div style="padding:0 16px 13px;font-size:12px;color:var(--ink3);" id="rating-lbl-add">Tap a star to rate</div>
+    </div>
+    <div class="form-section" style="margin-bottom:0;">
+      <div class="section-title"><span>📝</span> Notes <span style="font-size:9px;font-weight:300;color:var(--ink4);margin-left:4px;">optional</span></div>
+      <div class="field" style="border-bottom:none;"><textarea class="notes-input" id="f-notes" placeholder="Tasting notes, occasion, who you shared it with…" rows="3"></textarea></div>
+    </div>
+    <div style="height:16px;"></div>
+  </div>
+  <div class="save-bar"><button class="save-btn" onclick="saveWine()"><span>🍾</span> Save to my cellar</button></div>
+</div>
+
+<!-- SCREEN 3: BOTTLE DETAIL -->
+<div class="screen hidden" id="s-detail">
+  <div class="statusbar"><span class="sb-time" id="clock3">9:41</span><div class="sb-icons"><span>▲▲▲</span><span>WiFi</span><span>🔋</span></div></div>
+  <div class="detail-hero">
+    <div class="hero-topbar">
+      <button class="back-btn" onclick="goBack()">←</button>
+      <div class="hero-actions">
+        <button class="icon-btn" onclick="shareWine()" title="Share">↗</button>
+        <button class="icon-btn" onclick="showToast('Edit feature coming soon!')" title="Edit">✏</button>
+      </div>
+    </div>
+    <div class="hero-content">
+      <div>
+        <input type="file" id="detail-photo-input" accept="image/*" capture="environment" onchange="handleDetailPhoto(this)" style="display:none"/>
+        <img class="label-img" id="detail-label-img" alt="Label"/>
+        <div class="label-ph" id="detail-label-ph" onclick="document.getElementById('detail-photo-input').click()"><span>📸</span><span>No photo</span></div>
+      </div>
+      <div class="hero-text">
+        <div class="type-badge badge-red" id="d-type-badge">Red wine</div>
+        <div class="hero-name" id="d-name">Wine name</div>
+        <div class="hero-producer" id="d-producer"></div>
+        <div class="hero-meta"><span class="hero-vintage" id="d-vintage">2018</span><div class="hero-stars-wrap" id="d-stars-wrap"></div></div>
+        <div class="hero-rating-lbl" id="d-rating-lbl"></div>
+      </div>
+    </div>
+  </div>
+  <div class="scrollable parch-bg" id="detail-scroll">
+    <div class="qty-card" id="d-qty-card">
+      <div class="qty-left"><div class="qty-lbl">Bottles in cellar</div><div class="qty-big" id="d-qty-num">3</div><div class="qty-unit">bottles remaining</div></div>
+      <div class="qty-ctrls"><button class="qty-ctrl-btn plus" onclick="detailChangeQty(1)">+</button><button class="qty-ctrl-btn minus" onclick="detailChangeQty(-1)">−</button></div>
+    </div>
+    <div class="low-stock-warn" id="low-stock-warn"><span>⚠️</span><span>Only <strong id="low-stock-n">1</strong> bottle left — consider restocking</span></div>
+    <div class="info-card">
+      <div class="info-card-title"><span>🍾</span> Wine details</div>
+      <div class="info-row"><span class="info-key">Grape</span><span class="info-val" id="d-grape">—</span></div>
+      <div class="info-row"><span class="info-key">Country</span><span class="info-val" id="d-country">—</span></div>
+      <div class="info-row"><span class="info-key">Region</span><span class="info-val" id="d-region">—</span></div>
+      <div class="info-row"><span class="info-key">Vintage</span><span class="info-val" id="d-vintage2">—</span></div>
+      <div class="info-row"><span class="info-key">Price paid</span><span class="info-val price-val" id="d-price">—</span></div>
+      <div class="info-row"><span class="info-key">Added</span><span class="info-val" id="d-added">—</span></div>
+    </div>
+    <div class="info-card"><div class="info-card-title"><span>👅</span> Flavour profile</div><div class="ftags-wrap" id="d-flavours"></div></div>
+    <div class="info-card"><div class="info-card-title"><span>🍽️</span> Food pairings</div><div class="ftags-wrap" id="d-pairings"></div></div>
+    <div class="info-card"><div class="info-card-title"><span>📝</span> My notes</div><div id="d-notes-wrap"></div></div>
+    <!-- Tasting Log -->
+    <div class="info-card" style="margin-bottom:0;">
+      <div class="info-card-title"><span>🗓️</span> Log a tasting</div>
+      <div class="log-toggle-wrap">
+        <div class="log-toggle">
+          <button class="log-opt on" id="log-quick-btn" onclick="setLogMode('quick')"><span>⚡</span> Quick sip</button>
+          <button class="log-opt" id="log-full-btn" onclick="setLogMode('full')"><span>📖</span> Full tasting</button>
+        </div>
+      </div>
+      <div style="border-top:0.5px solid var(--border);">
+        <div class="field"><div class="flbl">Date opened</div><input class="finput" id="t-date" type="date"/></div>
+        <div class="field" id="t-occasion-wrap" style="display:none;"><div class="flbl">Occasion</div><input class="finput" id="t-occasion" type="text" placeholder="e.g. Anniversary dinner"/></div>
+        <div class="field" id="t-with-wrap" style="display:none;"><div class="flbl">Shared with</div><input class="finput" id="t-with" type="text" placeholder="e.g. Sarah & James"/></div>
+        <div class="field" id="t-food-wrap" style="display:none;"><div class="flbl">Paired with</div><input class="finput" id="t-food" type="text" placeholder="e.g. Dry-aged ribeye"/></div>
+        <div class="field"><div class="flbl">Quick note</div><input class="finput" id="t-note" type="text" placeholder="How was it tonight?"/></div>
+        <div class="field" style="border-bottom:none;"><div class="flbl">Rating this bottle</div><div class="star-row" id="star-row-tasting" style="padding:6px 0 0;"></div></div>
+      </div>
+      <div style="padding:12px 16px;"><button class="save-btn" style="font-size:16px;padding:13px;" onclick="saveTasting()"><span>🍷</span> Log this tasting</button></div>
+    </div>
+    <div style="margin:14px 16px 0;">
+      <div style="font-size:9px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink3);padding:0 0 10px;display:flex;align-items:center;gap:8px;"><span>📚</span> Tasting history</div>
+      <div id="tasting-history-list"></div>
+    </div>
+    <div class="action-grid">
+      <button class="act-btn" onclick="shareWine()"><span class="act-btn-icon">↗️</span><span>Share wine</span></button>
+      <button class="act-btn danger" onclick="openDeleteModal()"><span class="act-btn-icon">🗑️</span><span>Remove wine</span></button>
+    </div>
+    <div class="scroll-end"></div>
+  </div>
+</div>
+
+<!-- SCREEN 4: TONIGHT'S PICK -->
+<div class="screen hidden" id="s-tonight">
+  <div class="statusbar"><span class="sb-time" id="clock4">9:41</span><div class="sb-icons"><span>▲▲▲</span><span>WiFi</span><span>🔋</span></div></div>
+  <div class="tonight-header">
+    <div class="step-progress" id="step-progress"></div>
+    <div class="step-q" id="step-q">What's your <em>mood</em>?</div>
+    <div class="step-hint" id="step-hint">Based on what's in your cellar right now</div>
+  </div>
+  <div class="bubble-canvas" id="bubble-canvas"></div>
+  <div class="tonight-action-bar">
+    <button class="skip-btn" onclick="tonightNextStep()">Skip</button>
+    <button class="next-btn next-idle" id="tonight-next-btn" onclick="tonightNextStep()">
+      <span id="tonight-next-lbl">Tap a bubble</span>
+      <span class="next-count" id="tonight-next-count"></span>
+    </button>
+  </div>
+  <div class="bnav">
+    <button class="ni" onclick="setNav(0)"><span class="ni-icon">🍾</span><span class="ni-lbl">Cellar</span></button>
+    <button class="ni on"><span class="ni-icon">🌙</span><span class="ni-lbl">Tonight</span></button>
+    <button class="ni" onclick="openAddScreen()"><span class="ni-icon">＋</span><span class="ni-lbl">Add</span></button>
+    <button class="ni" onclick="setNav(3)"><span class="ni-icon">⚙️</span><span class="ni-lbl">Settings</span></button>
+  </div>
+  <div class="results-overlay" id="results-overlay">
+    <div class="res-topbar">
+      <button class="back-btn" onclick="closeTonightResults()">←</button>
+      <div><div class="res-title" id="res-title">Matches</div><div class="res-sub">From your cellar · best first</div></div>
+    </div>
+    <div class="res-pills" id="res-pills"></div>
+    <div class="res-scroll" id="res-scroll"></div>
+  </div>
+</div>
+<script>
+window.onerror=function(msg,src,line,col,err){
+  console.error('JS ERROR:',msg,'at line',line);
+};
+// ══════════════════════════════════════════
+// SUPABASE CLIENT
+// ══════════════════════════════════════════
+// Supabase — public keys are safe in frontend code
+const SUPABASE_URL = 'https://zgnuqrrzeezddmczkjrm.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpnbnVxcnJ6ZWV6ZGRtY3pranJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1NjA2NDIsImV4cCI6MjA5NDEzNjY0Mn0.pg6SbGgsKbvz-ShOoUzOAzeFcvUSXZvJ3J0eZNOt6L4';
+// Anthropic API key is stored securely in Netlify environment variables
+// and called via /.netlify/functions/claude — never exposed here
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── Local theme pref only (not wine data) ──
+const LocalDB = {
+  save(k,v){try{localStorage.setItem('wc_'+k,JSON.stringify(v))}catch(e){}},
+  load(k,d){try{const v=localStorage.getItem('wc_'+k);return v?JSON.parse(v):d}catch(e){return d}},
+};
+
+// ── In-memory state (populated from Supabase) ──
+let wines    = [];
+let tastings = [];
+let currentUser = null;
+
+// ══════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════
+let loginMode = 'signin'; // 'signin' | 'signup'
+
+function toggleLoginMode(){
+  loginMode = loginMode==='signin'?'signup':'signin';
+  const btn = document.getElementById('login-btn');
+  const tog = document.getElementById('login-toggle-txt');
+  if(loginMode==='signup'){
+    btn.textContent='Create account';
+    tog.innerHTML='Already have an account? <a onclick="toggleLoginMode()">Sign in</a>';
+  } else {
+    btn.textContent='Sign in';
+    tog.innerHTML='No account yet? <a onclick="toggleLoginMode()">Create one</a>';
+  }
+}
+
+function showLoginError(msg){
+  const el=document.getElementById('login-err');
+  el.textContent=msg; el.classList.add('show');
+}
+function clearLoginError(){ document.getElementById('login-err').classList.remove('show'); }
+
+async function handleLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pw=document.getElementById('login-pw').value;
+  if(!email){showLoginError('Please enter your email');return;}
+  if(!pw){showLoginError('Please enter your password');return;}
+  clearLoginError();
+  const btn=document.getElementById('login-btn');
+  btn.disabled=true; btn.textContent='Please wait…';
+  try{
+    let result;
+    if(loginMode==='signup'){
+      result=await sb.auth.signUp({email,password:pw});
+      if(result.error)throw result.error;
+      if(result.data.user&&!result.data.session){
+        // Email confirmation sent — show friendly message
+        document.getElementById('login-form-wrap').style.display='none';
+        const ms=document.getElementById('login-magic-sent');
+        document.getElementById('magic-email-sent').textContent=email;
+        ms.querySelector('.login-success-title').textContent='Almost there!';
+        ms.querySelector('.login-success-sub').innerHTML='Check your email at <strong>'+email+'</strong> and tap the confirmation link to activate your account. Then come back here and sign in.';
+        ms.classList.add('show');
+        btn.disabled=false;
+        btn.textContent='Create account';
+        return;
+      }
+    } else {
+      result=await sb.auth.signInWithPassword({email,password:pw});
+      if(result.error)throw result.error;
+    }
+  } catch(e){
+    showLoginError(e.message||'Sign in failed. Please try again.');
+    btn.disabled=false;
+    btn.textContent=loginMode==='signup'?'Create account':'Sign in';
+  }
+}
+
+async function sendMagicLink(){
+  const email=document.getElementById('login-email').value.trim();
+  if(!email){showLoginError('Enter your email first');return;}
+  clearLoginError();
+  const{error}=await sb.auth.signInWithOtp({email});
+  if(error){showLoginError(error.message);return;}
+  document.getElementById('login-form-wrap').style.display='none';
+  const ms=document.getElementById('login-magic-sent');
+  document.getElementById('magic-email-sent').textContent=email;
+  ms.classList.add('show');
+}
+
+function updateUserUI(user){
+  if(!user)return;
+  const email=user.email||'';
+  const initial=(email[0]||'?').toUpperCase();
+  const av=document.getElementById('user-avatar');
+  const em=document.getElementById('user-email-display');
+  if(av)av.textContent=initial;
+  if(em)em.textContent=email;
+  const se=document.getElementById('set-email');
+  if(se)se.textContent=email;
+}
+
+// ══════════════════════════════════════════
+// DATABASE FUNCTIONS
+// ══════════════════════════════════════════
+async function loadAllData(){
+  const[{data:w,error:we},{data:t,error:te}]=await Promise.all([
+    sb.from('wines').select('*').order('added',{ascending:false}),
+    sb.from('tastings').select('*').order('created',{ascending:false}),
+  ]);
+  if(we)console.error('wines load error:',we);
+  if(te)console.error('tastings load error:',te);
+  wines    = (w||[]).map(dbToWine);
+  tastings = (t||[]).map(dbToTasting);
+}
+
+// Convert Supabase row → app object
+function dbToWine(r){
+  return {
+    id:r.id, name:r.name, producer:r.producer, type:r.type,
+    country:r.country, region:r.region, grape:r.grape,
+    vintage:r.vintage, rating:parseFloat(r.rating)||0,
+    qty:r.qty||0, price:parseFloat(r.price)||null,
+    flavours:r.flavours||[], pairings:r.pairings||[],
+    notes:r.notes, photo:r.photo,
+    consumed:r.consumed||false,
+    added:r.added,
+  };
+}
+function dbToTasting(r){
+  return {
+    id:r.id, wineId:r.wine_id, date:r.date, mode:r.mode||'quick',
+    occasion:r.occasion, with:r.shared_with, food:r.food,
+    note:r.note, rating:parseFloat(r.rating)||0,
+  };
+}
+
+async function dbSaveWine(wine){
+  const row={
+    user_id:currentUser.id,
+    name:wine.name, producer:wine.producer||wine.name,
+    type:wine.type||'red', country:wine.country, region:wine.region,
+    grape:wine.grape, vintage:wine.vintage?parseInt(wine.vintage):null,
+    rating:wine.rating||null, qty:wine.qty||1,
+    price:wine.price||null, flavours:wine.flavours||[],
+    pairings:wine.pairings||[], notes:wine.notes||null,
+    photo:wine.photo||null, consumed:false,
+  };
+  const{data,error}=await sb.from('wines').insert(row).select().single();
+  if(error)throw error;
+  return dbToWine(data);
+}
+
+async function dbUpdateWineQty(id,qty,consumed){
+  const{error}=await sb.from('wines').update({qty,consumed}).eq('id',id);
+  if(error)console.error('qty update error:',error);
+}
+
+async function dbUpdateWinePhoto(id,photo){
+  const{error}=await sb.from('wines').update({photo}).eq('id',id);
+  if(error)console.error('photo update error:',error);
+}
+
+async function dbDeleteWine(id){
+  const{error}=await sb.from('wines').delete().eq('id',id);
+  if(error)throw error;
+}
+
+async function dbSaveTasting(t){
+  const row={
+    user_id:currentUser.id, wine_id:t.wineId,
+    date:t.date, mode:t.mode||'quick',
+    occasion:t.occasion||null, shared_with:t.with||null,
+    food:t.food||null, note:t.note||null,
+    rating:t.rating||null,
+  };
+  const{data,error}=await sb.from('tastings').insert(row).select().single();
+  if(error)throw error;
+  return dbToTasting(data);
+}
+
+// ══════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════
+let screenStack=['s-cellar'];
+
+function showScreen(id,push=true){
+  const cur=document.querySelector('.screen.active');
+  if(cur&&cur.id===id)return;
+  if(cur)cur.classList.replace('active',push?'back':'hidden');
+  const nxt=document.getElementById(id);
+  nxt.classList.remove('hidden','back');
+  nxt.classList.add('active');
+  if(push)screenStack.push(id);
+  updateClocks();
+}
+function goBack(){
+  if(screenStack.length<=1)return;
+  const cur=document.querySelector('.screen.active');
+  if(cur)cur.classList.replace('active','hidden');
+  screenStack.pop();
+  const prev=document.getElementById(screenStack[screenStack.length-1]);
+  prev.classList.remove('hidden','back');
+  prev.classList.add('active');
+  if(prev.id==='s-cellar')renderCellar();
+  updateClocks();
+}
+function setNav(idx){
+  if(idx===0){screenStack=['s-cellar'];showScreen('s-cellar',false);renderCellar();}
+  if(idx===1){showScreen('s-tonight',true);tonightRenderStep();}
+  if(idx===3){showScreen('s-settings',true);renderSettings();}
+}
+
+// ── THEME SYSTEM ──
+const THEMES=['classic','tekapo','zermatt'];
+let currentTheme=LocalDB.load('theme','classic');
+
+function applyTheme(theme){
+  currentTheme=theme;
+  LocalDB.save('theme',theme);
+  document.documentElement.setAttribute('data-theme',theme);
+  // Update theme card active states
+  THEMES.forEach(t=>{
+    const el=document.getElementById('tc-'+t);
+    if(el)el.classList.toggle('on',t===theme);
+  });
+  // Smooth repaint hint
+  document.body.style.transition='background 0.7s ease';
+}
+
+function initTheme(){
+  document.documentElement.setAttribute('data-theme',currentTheme);
+  THEMES.forEach(t=>{
+    const el=document.getElementById('tc-'+t);
+    if(el)el.classList.toggle('on',t===currentTheme);
+  });
+}
+
+function renderSettings(){
+  const active=wines.filter(w=>!w.consumed&&w.qty>0);
+  const totalB=active.reduce((s,w)=>s+w.qty,0);
+  const totalV=active.filter(w=>w.price).reduce((s,w)=>s+(w.price*w.qty),0);
+  document.getElementById('set-bottles').textContent=totalB;
+  document.getElementById('set-wines').textContent=active.length;
+  document.getElementById('set-tastings').textContent=tastings.length;
+  document.getElementById('set-value').textContent=totalV>0?'RM '+totalV.toLocaleString():'—';
+}
+async function handleSignOut(){
+  await sb.auth.signOut();
+  wines=[];tastings=[];currentUser=null;
+  screenStack=['s-login'];
+  showScreen('s-login',false);
+  showToast('Signed out');
+}
+
+function exportData(){
+  const data=JSON.stringify({wines,tastings,user:currentUser?.email,exported:new Date().toISOString()},null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='my-cellar-backup.json';a.click();
+  URL.revokeObjectURL(url);
+  showToast('Data exported!');
+}
+function openAddScreen(){resetAddForm();showScreen('s-add');}
+function openDetailScreen(id){currentDetailId=id;renderDetail(id);showScreen('s-detail');}
+
+// ══════════════════════════════════════════
+// CLOCK & TOAST
+// ══════════════════════════════════════════
+function updateClocks(){
+  const t=new Date(),h=t.getHours().toString().padStart(2,'0'),m=t.getMinutes().toString().padStart(2,'0');
+  document.querySelectorAll('[id^="clock"]').forEach(el=>el.textContent=h+':'+m);
+}
+updateClocks();setInterval(updateClocks,10000);
+
+function showToast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2400);
+}
+
+// ══════════════════════════════════════════
+// TAG COLOURS & HELPERS
+// ══════════════════════════════════════════
+const TAG_COL={
+  "Dark berries":{bg:"#FAECE7",c:"#712B13"},"Black cherry":{bg:"#FAECE7",c:"#712B13"},"Red berries":{bg:"#FAECE7",c:"#712B13"},"Stone fruit":{bg:"#FAECE7",c:"#712B13"},"Citrus":{bg:"#FAECE7",c:"#712B13"},"Tropical":{bg:"#FAECE7",c:"#712B13"},"Apple & pear":{bg:"#FAECE7",c:"#712B13"},"Dried fruit":{bg:"#FAECE7",c:"#712B13"},"Jammy":{bg:"#FAECE7",c:"#712B13"},
+  "Cedar":{bg:"#FAEEDA",c:"#633806"},"Black pepper":{bg:"#FAEEDA",c:"#633806"},"Vanilla":{bg:"#FAEEDA",c:"#633806"},"Cinnamon":{bg:"#FAEEDA",c:"#633806"},"Clove":{bg:"#FAEEDA",c:"#633806"},"Toasty oak":{bg:"#FAEEDA",c:"#633806"},"Nutmeg":{bg:"#FAEEDA",c:"#633806"},"Toasty":{bg:"#FAEEDA",c:"#633806"},
+  "Tannic":{bg:"#E6F1FB",c:"#0C447C"},"Full-bodied":{bg:"#E6F1FB",c:"#0C447C"},"Velvety":{bg:"#E6F1FB",c:"#0C447C"},"Silky":{bg:"#E6F1FB",c:"#0C447C"},"Soft tannins":{bg:"#E6F1FB",c:"#0C447C"},
+  "Mushroom":{bg:"#EAF3DE",c:"#27500A"},"Forest floor":{bg:"#EAF3DE",c:"#27500A"},"Mineral":{bg:"#EAF3DE",c:"#27500A"},"Herbaceous":{bg:"#EAF3DE",c:"#27500A"},"Grassy":{bg:"#EAF3DE",c:"#27500A"},"Leather":{bg:"#EAF3DE",c:"#27500A"},
+  "Smoky":{bg:"#F1EFE8",c:"#444441"},"Meaty":{bg:"#F1EFE8",c:"#444441"},"Tobacco":{bg:"#F1EFE8",c:"#444441"},"Charcoal":{bg:"#F1EFE8",c:"#444441"},
+  "Crisp & clean":{bg:"#E1F5EE",c:"#085041"},"Zesty":{bg:"#E1F5EE",c:"#085041"},"Fresh & bright":{bg:"#E1F5EE",c:"#085041"},"Light-bodied":{bg:"#E1F5EE",c:"#085041"},"Bubbly":{bg:"#E1F5EE",c:"#085041"},"Sea breeze":{bg:"#E1F5EE",c:"#085041"},
+  "Rose petal":{bg:"#FBEAF0",c:"#72243E"},"Violet":{bg:"#FBEAF0",c:"#72243E"},"Jasmine":{bg:"#FBEAF0",c:"#72243E"},"Lavender":{bg:"#FBEAF0",c:"#72243E"},"Orange blossom":{bg:"#FBEAF0",c:"#72243E"},"Honeysuckle":{bg:"#FBEAF0",c:"#72243E"},
+  "Honey":{bg:"#EEEDFE",c:"#3C3489"},"Caramel":{bg:"#EEEDFE",c:"#3C3489"},"Chocolate":{bg:"#EEEDFE",c:"#3C3489"},"Coffee":{bg:"#EEEDFE",c:"#3C3489"},"Cream":{bg:"#EEEDFE",c:"#3C3489"},"Butterscotch":{bg:"#EEEDFE",c:"#3C3489"},"Toffee":{bg:"#EEEDFE",c:"#3C3489"},"Molasses":{bg:"#EEEDFE",c:"#3C3489"},
+};
+const FOOD_COL={bg:"#EAF3DE",c:"#27500A"};
+const TYPE_BADGE={red:'badge-red',white:'badge-white',rose:'badge-rose',sparkling:'badge-sparkling',dessert:'badge-dessert'};
+const TYPE_LABEL={red:'Red wine',white:'White wine',rose:'Rosé',sparkling:'Sparkling',dessert:'Dessert wine'};
+const TYPE_STRIPE={red:'stripe-red',white:'stripe-white',rose:'stripe-rose',sparkling:'stripe-sparkling',dessert:'stripe-dessert'};
+const TYPE_BAR={red:'bar-red',white:'bar-white',rose:'bar-rose',sparkling:'bar-sparkling',dessert:'bar-dessert'};
+const RATING_LABELS={0.5:'Too early to say',1:'Not for me',1.5:'Passable',2:'Decent',2.5:'Getting there',3:'Good',3.5:'Very good',4:'Really enjoyed it',4.5:'Exceptional',5:'Outstanding! 🏆'};
+
+function tagHtml(f,lit=false){const c=TAG_COL[f]||{bg:'#f0ebe3',c:'#5c3d28'};return `<span class="tag${lit?' lit':''}" style="background:${c.bg};color:${c.c};">${f}</span>`;}
+
+// ══════════════════════════════════════════
+// SCREEN 1 — CELLAR
+// ══════════════════════════════════════════
+let currentFilter='all',currentSort=0,currentSearch='';
+const sortModes=['Newest first','Name A–Z','Highest rated','Most bottles'];
+
+function renderCellar(){
+  let list=[...wines];
+  if(currentFilter==='consumed')list=list.filter(w=>w.consumed||w.qty===0);
+  else if(currentFilter!=='all')list=list.filter(w=>w.type===currentFilter&&!w.consumed&&w.qty>0);
+  else list=list.filter(w=>!w.consumed&&w.qty>0);
+  if(currentSearch){const q=currentSearch.toLowerCase();list=list.filter(w=>[w.name,w.producer,w.country,w.region,w.grape].some(s=>s&&s.toLowerCase().includes(q)));}
+  if(currentSort===0)list.sort((a,b)=>new Date(b.added)-new Date(a.added));
+  if(currentSort===1)list.sort((a,b)=>a.name.localeCompare(b.name));
+  if(currentSort===2)list.sort((a,b)=>(b.rating||0)-(a.rating||0));
+  if(currentSort===3)list.sort((a,b)=>b.qty-a.qty);
+  const active=wines.filter(w=>!w.consumed&&w.qty>0);
+  const totalB=active.reduce((s,w)=>s+w.qty,0);
+  const rated=active.filter(w=>w.rating);
+  const avg=rated.length?(rated.reduce((s,w)=>s+w.rating,0)/rated.length).toFixed(1):'—';
+  document.getElementById('s-bottles').textContent=totalB;
+  document.getElementById('s-wines').textContent=active.length;
+  document.getElementById('s-rating').textContent=avg;
+  document.getElementById('list-count').textContent=`${list.length} wine${list.length!==1?'s':''}`;
+  const cont=document.getElementById('wine-list');
+  if(!list.length){cont.innerHTML=`<div class="empty-state"><div class="empty-icon">🍷</div><div class="empty-title">Nothing here yet</div><div class="empty-sub">Tap + to add your first wine.</div><button class="empty-cta" onclick="openAddScreen()">+ Add a wine</button></div>`;return;}
+  cont.innerHTML=list.map((w,i)=>{
+    const stripe=TYPE_STRIPE[w.type]||'stripe-red';
+    const tags=(w.flavours||[]).slice(0,3).map(f=>tagHtml(f)).join('');
+    const thumbHtml = w.photo && w.photo.startsWith('data')
+      ? `<div class="wcard-thumb"><img src="${w.photo}" alt=""/></div>`
+      : `<div class="wcard-thumb"><div class="wcard-thumb-ph" style="background:${{'red':'#f5e8ea','white':'#faeeda','rose':'#fbeaf0','sparkling':'#e2f0ed','dessert':'#eeedfe'}[w.type]||'#f5e8ea'};">${{'red':'🍷','white':'🥂','rose':'🌸','sparkling':'✨','dessert':'🍯'}[w.type]||'🍷'}</div></div>`;
+    return `<div class="wcard" style="animation-delay:${i*0.045}s" onclick="openDetailScreen(${w.id})">
+      <div class="wcard-inner">
+        ${thumbHtml}
+        <div class="wcard-body">
+          <div class="wcard-top">
+            <div class="wine-name">${w.name}</div>
+            <div class="qty-row" onclick="event.stopPropagation()">
+              <button class="qty-tap" onclick="adjustQty(${w.id},-1)">−</button>
+              <span class="qty-val" id="qty-${w.id}">${w.qty===0?'✓':w.qty}</span>
+              <button class="qty-tap" onclick="adjustQty(${w.id},+1)">+</button>
+            </div>
+          </div>
+          <div class="wine-sub">${[w.producer,w.region,w.country].filter(Boolean).join(' · ')}</div>
+          <div class="wcard-meta"><div class="tag-row">${tags}</div><div class="wine-stars">${'★'.repeat(Math.floor(w.rating||0))}${'☆'.repeat(5-Math.floor(w.rating||0))}</div></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function adjustQty(id,delta){
+  const w=wines.find(x=>x.id===id);if(!w)return;
+  w.qty=Math.max(0,w.qty+delta);
+  if(w.qty===0)w.consumed=true;
+  dbUpdateWineQty(id,w.qty,w.consumed);
+  const el=document.getElementById('qty-'+id);
+  if(el)el.textContent=w.qty===0?'✓':w.qty;
+  const active=wines.filter(x=>!x.consumed&&x.qty>0);
+  document.getElementById('s-bottles').textContent=active.reduce((s,x)=>s+x.qty,0);
+}
+function cycleSortMode(){currentSort=(currentSort+1)%sortModes.length;document.getElementById('sort-lbl').textContent=sortModes[currentSort]+' ↓';renderCellar();}
+document.getElementById('filter-row').addEventListener('click',e=>{const b=e.target.closest('.fpill');if(!b)return;document.querySelectorAll('.fpill').forEach(x=>x.classList.remove('on'));b.classList.add('on');currentFilter=b.dataset.filter;renderCellar();});
+document.getElementById('search-input').addEventListener('input',e=>{currentSearch=e.target.value.trim();renderCellar();});
+
+// ══════════════════════════════════════════
+// SCREEN 2 — ADD A WINE
+// ══════════════════════════════════════════
+const GRAPE_FLAVOURS={
+  "Cabernet Sauvignon":[{l:"Dark berries",bg:"#FAECE7",c:"#712B13"},{l:"Black cherry",bg:"#FAECE7",c:"#712B13"},{l:"Cedar",bg:"#FAEEDA",c:"#633806"},{l:"Black pepper",bg:"#FAEEDA",c:"#633806"},{l:"Tannic",bg:"#E6F1FB",c:"#0C447C"},{l:"Full-bodied",bg:"#E6F1FB",c:"#0C447C"},{l:"Tobacco",bg:"#F1EFE8",c:"#444441"}],
+  "Merlot":[{l:"Dark berries",bg:"#FAECE7",c:"#712B13"},{l:"Stone fruit",bg:"#FAECE7",c:"#712B13"},{l:"Vanilla",bg:"#FAEEDA",c:"#633806"},{l:"Velvety",bg:"#E6F1FB",c:"#0C447C"},{l:"Chocolate",bg:"#EEEDFE",c:"#3C3489"},{l:"Soft tannins",bg:"#E6F1FB",c:"#0C447C"}],
+  "Pinot Noir":[{l:"Red berries",bg:"#FAECE7",c:"#712B13"},{l:"Mushroom",bg:"#EAF3DE",c:"#27500A"},{l:"Forest floor",bg:"#EAF3DE",c:"#27500A"},{l:"Light-bodied",bg:"#E1F5EE",c:"#085041"},{l:"Rose petal",bg:"#FBEAF0",c:"#72243E"},{l:"Silky",bg:"#E6F1FB",c:"#0C447C"}],
+  "Syrah / Shiraz":[{l:"Dark berries",bg:"#FAECE7",c:"#712B13"},{l:"Black pepper",bg:"#FAEEDA",c:"#633806"},{l:"Smoky",bg:"#F1EFE8",c:"#444441"},{l:"Meaty",bg:"#F1EFE8",c:"#444441"},{l:"Full-bodied",bg:"#E6F1FB",c:"#0C447C"},{l:"Violet",bg:"#FBEAF0",c:"#72243E"}],
+  "Chardonnay":[{l:"Stone fruit",bg:"#FAECE7",c:"#712B13"},{l:"Apple & pear",bg:"#FAECE7",c:"#712B13"},{l:"Vanilla",bg:"#FAEEDA",c:"#633806"},{l:"Toasty oak",bg:"#FAEEDA",c:"#633806"},{l:"Cream",bg:"#EEEDFE",c:"#3C3489"},{l:"Butterscotch",bg:"#EEEDFE",c:"#3C3489"}],
+  "Sauvignon Blanc":[{l:"Citrus",bg:"#FAECE7",c:"#712B13"},{l:"Tropical",bg:"#FAECE7",c:"#712B13"},{l:"Grassy",bg:"#EAF3DE",c:"#27500A"},{l:"Crisp & clean",bg:"#E1F5EE",c:"#085041"},{l:"Zesty",bg:"#E1F5EE",c:"#085041"},{l:"Herbaceous",bg:"#EAF3DE",c:"#27500A"}],
+  "Riesling":[{l:"Citrus",bg:"#FAECE7",c:"#712B13"},{l:"Stone fruit",bg:"#FAECE7",c:"#712B13"},{l:"Zesty",bg:"#E1F5EE",c:"#085041"},{l:"Mineral",bg:"#EAF3DE",c:"#27500A"},{l:"Jasmine",bg:"#FBEAF0",c:"#72243E"},{l:"Light-bodied",bg:"#E1F5EE",c:"#085041"}],
+  "Grenache":[{l:"Red berries",bg:"#FAECE7",c:"#712B13"},{l:"Cinnamon",bg:"#FAEEDA",c:"#633806"},{l:"Clove",bg:"#FAEEDA",c:"#633806"},{l:"Chocolate",bg:"#EEEDFE",c:"#3C3489"},{l:"Light-bodied",bg:"#E1F5EE",c:"#085041"},{l:"Jammy",bg:"#FAECE7",c:"#712B13"}],
+  "Tempranillo":[{l:"Dark berries",bg:"#FAECE7",c:"#712B13"},{l:"Leather",bg:"#EAF3DE",c:"#27500A"},{l:"Tobacco",bg:"#F1EFE8",c:"#444441"},{l:"Cedar",bg:"#FAEEDA",c:"#633806"},{l:"Herbaceous",bg:"#EAF3DE",c:"#27500A"},{l:"Tannic",bg:"#E6F1FB",c:"#0C447C"}],
+  "Champagne blend":[{l:"Bubbly",bg:"#E1F5EE",c:"#085041"},{l:"Crisp & clean",bg:"#E1F5EE",c:"#085041"},{l:"Apple & pear",bg:"#FAECE7",c:"#712B13"},{l:"Cream",bg:"#EEEDFE",c:"#3C3489"},{l:"Mineral",bg:"#EAF3DE",c:"#27500A"},{l:"Toasty",bg:"#F1EFE8",c:"#444441"}],
+  "Pinot Grigio":[{l:"Citrus",bg:"#FAECE7",c:"#712B13"},{l:"Apple & pear",bg:"#FAECE7",c:"#712B13"},{l:"Crisp & clean",bg:"#E1F5EE",c:"#085041"},{l:"Light-bodied",bg:"#E1F5EE",c:"#085041"},{l:"Mineral",bg:"#EAF3DE",c:"#27500A"}],
+  "Rosé blend":[{l:"Red berries",bg:"#FAECE7",c:"#712B13"},{l:"Rose petal",bg:"#FBEAF0",c:"#72243E"},{l:"Stone fruit",bg:"#FAECE7",c:"#712B13"},{l:"Fresh & bright",bg:"#E1F5EE",c:"#085041"},{l:"Crisp & clean",bg:"#E1F5EE",c:"#085041"}],
+  "Dessert blend":[{l:"Honey",bg:"#EEEDFE",c:"#3C3489"},{l:"Caramel",bg:"#EEEDFE",c:"#3C3489"},{l:"Dried fruit",bg:"#FAECE7",c:"#712B13"},{l:"Orange blossom",bg:"#FBEAF0",c:"#72243E"},{l:"Butterscotch",bg:"#EEEDFE",c:"#3C3489"},{l:"Molasses",bg:"#EEEDFE",c:"#3C3489"}],
+};
+const GRAPE_FOOD={
+  "Cabernet Sauvignon":["Steak","Lamb","Cheese","Charcuterie","Dark chocolate"],
+  "Merlot":["Pasta","Lamb","Cheese","Mushroom dishes"],
+  "Pinot Noir":["Salmon","Duck","Mushroom dishes","Charcuterie"],
+  "Syrah / Shiraz":["Steak","BBQ","Spicy food","Lamb"],
+  "Chardonnay":["Seafood","Pasta","Chicken","Cheese"],
+  "Sauvignon Blanc":["Seafood","Sushi","Salads","Goat cheese","Vegetarian"],
+  "Riesling":["Spicy food","Seafood","Sushi","Pork"],
+  "Grenache":["Pizza","Pasta","Tapas","Cheese"],
+  "Tempranillo":["Steak","Lamb","Tapas","Charcuterie"],
+  "Champagne blend":["Oysters","Sushi","Cheese","Just sipping","Celebrations"],
+  "Pinot Grigio":["Seafood","Salads","Light pasta","Vegetarian"],
+  "Rosé blend":["Seafood","Salads","Charcuterie","Just sipping","Picnic"],
+  "Dessert blend":["Dessert","Chocolate","Blue cheese","Just sipping"],
+};
+const ALL_FLAVOURS=[
+  {g:"Fruity",tags:[{l:"Red berries",bg:"#FAECE7",c:"#712B13"},{l:"Dark berries",bg:"#FAECE7",c:"#712B13"},{l:"Stone fruit",bg:"#FAECE7",c:"#712B13"},{l:"Citrus",bg:"#FAECE7",c:"#712B13"},{l:"Tropical",bg:"#FAECE7",c:"#712B13"},{l:"Dried fruit",bg:"#FAECE7",c:"#712B13"},{l:"Apple & pear",bg:"#FAECE7",c:"#712B13"},{l:"Black cherry",bg:"#FAECE7",c:"#712B13"},{l:"Jammy",bg:"#FAECE7",c:"#712B13"}]},
+  {g:"Floral",tags:[{l:"Rose petal",bg:"#FBEAF0",c:"#72243E"},{l:"Violet",bg:"#FBEAF0",c:"#72243E"},{l:"Jasmine",bg:"#FBEAF0",c:"#72243E"},{l:"Lavender",bg:"#FBEAF0",c:"#72243E"},{l:"Orange blossom",bg:"#FBEAF0",c:"#72243E"},{l:"Honeysuckle",bg:"#FBEAF0",c:"#72243E"}]},
+  {g:"Earthy & Savoury",tags:[{l:"Mushroom",bg:"#EAF3DE",c:"#27500A"},{l:"Forest floor",bg:"#EAF3DE",c:"#27500A"},{l:"Mineral",bg:"#EAF3DE",c:"#27500A"},{l:"Herbaceous",bg:"#EAF3DE",c:"#27500A"},{l:"Leather",bg:"#EAF3DE",c:"#27500A"},{l:"Grassy",bg:"#EAF3DE",c:"#27500A"}]},
+  {g:"Spice & Wood",tags:[{l:"Vanilla",bg:"#FAEEDA",c:"#633806"},{l:"Cinnamon",bg:"#FAEEDA",c:"#633806"},{l:"Clove",bg:"#FAEEDA",c:"#633806"},{l:"Black pepper",bg:"#FAEEDA",c:"#633806"},{l:"Cedar",bg:"#FAEEDA",c:"#633806"},{l:"Toasty oak",bg:"#FAEEDA",c:"#633806"},{l:"Nutmeg",bg:"#FAEEDA",c:"#633806"},{l:"Toasty",bg:"#FAEEDA",c:"#633806"}]},
+  {g:"Sweet & Rich",tags:[{l:"Honey",bg:"#EEEDFE",c:"#3C3489"},{l:"Caramel",bg:"#EEEDFE",c:"#3C3489"},{l:"Chocolate",bg:"#EEEDFE",c:"#3C3489"},{l:"Coffee",bg:"#EEEDFE",c:"#3C3489"},{l:"Butterscotch",bg:"#EEEDFE",c:"#3C3489"},{l:"Cream",bg:"#EEEDFE",c:"#3C3489"},{l:"Toffee",bg:"#EEEDFE",c:"#3C3489"},{l:"Molasses",bg:"#EEEDFE",c:"#3C3489"}]},
+  {g:"Fresh & Crisp",tags:[{l:"Crisp & clean",bg:"#E1F5EE",c:"#085041"},{l:"Zesty",bg:"#E1F5EE",c:"#085041"},{l:"Fresh & bright",bg:"#E1F5EE",c:"#085041"},{l:"Light-bodied",bg:"#E1F5EE",c:"#085041"},{l:"Bubbly",bg:"#E1F5EE",c:"#085041"},{l:"Sea breeze",bg:"#E1F5EE",c:"#085041"}]},
+  {g:"Bold & Full",tags:[{l:"Full-bodied",bg:"#E6F1FB",c:"#0C447C"},{l:"Tannic",bg:"#E6F1FB",c:"#0C447C"},{l:"Velvety",bg:"#E6F1FB",c:"#0C447C"},{l:"Silky",bg:"#E6F1FB",c:"#0C447C"},{l:"Soft tannins",bg:"#E6F1FB",c:"#0C447C"}]},
+  {g:"Smoke & Toast",tags:[{l:"Smoky",bg:"#F1EFE8",c:"#444441"},{l:"Toasty",bg:"#F1EFE8",c:"#444441"},{l:"Charcoal",bg:"#F1EFE8",c:"#444441"},{l:"Meaty",bg:"#F1EFE8",c:"#444441"},{l:"Tobacco",bg:"#F1EFE8",c:"#444441"}]},
+];
+const ALL_FOOD=[
+  {g:"Meat",tags:["Steak","Lamb","Pork","Duck","Chicken","BBQ","Charcuterie"]},
+  {g:"Seafood",tags:["Seafood","Salmon","Sushi","Oysters"]},
+  {g:"Pasta & grains",tags:["Pasta","Pizza","Light pasta","Risotto"]},
+  {g:"Light & veggie",tags:["Salads","Vegetarian","Tapas","Mushroom dishes","Spicy food"]},
+  {g:"Cheese",tags:["Cheese","Goat cheese","Blue cheese"]},
+  {g:"Sweet",tags:["Dessert","Chocolate","Dark chocolate","Fruit tart"]},
+  {g:"No food",tags:["Just sipping","Celebrations","Picnic"]},
+];
+
+let addQty=1,addRating=0,selectedGrape=null,activeFlavours=new Set(),activeFoods=new Set(),allFlavOpen=false,allFoodOpen=false;
+
+function resetAddForm(){
+  addQty=1;addRating=0;selectedGrape=null;activeFlavours=new Set();activeFoods=new Set();allFlavOpen=false;allFoodOpen=false;
+  ['f-name','f-vintage','f-country','f-region','f-price','f-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const ft=document.getElementById('f-type');if(ft)ft.value='';
+  document.getElementById('add-qty-display').textContent='1';
+  document.getElementById('photo-preview').style.display='none';
+  document.getElementById('photo-icon').style.display='block';
+  document.getElementById('photo-txt').style.display='block';
+  document.querySelectorAll('.grape-chip').forEach(c=>c.classList.remove('on'));
+  document.getElementById('flavour-suggested').innerHTML='';
+  document.getElementById('food-suggested').innerHTML='';
+  document.getElementById('suggest-banner').classList.remove('show');
+  document.getElementById('food-suggest-banner').classList.remove('show');
+  document.getElementById('no-flavour-msg').style.display='block';
+  document.getElementById('no-food-msg').style.display='block';
+  document.getElementById('all-flavours').classList.remove('open');
+  document.getElementById('all-food').classList.remove('open');
+  document.getElementById('collapse-flavours').classList.remove('show');
+  document.getElementById('collapse-food').classList.remove('show');
+  document.getElementById('photo-preview-wrap').classList.remove('show');
+  document.getElementById('scan-filled').classList.remove('show');
+  document.getElementById('wine-result-card').classList.remove('show');
+  document.getElementById('wine-search-error').classList.remove('show');
+  document.getElementById('wine-search-input').value='';
+  document.getElementById('wine-search-spinner').classList.remove('on');
+  lastSearchResult=null;
+  addPhotoData=null;
+  document.getElementById('add-form-scroll').scrollTop=0;
+  buildAddStars();
+}
+function changeAddQty(d){addQty=Math.max(1,addQty+d);document.getElementById('add-qty-display').textContent=addQty;}
+let addPhotoData=null,scanAborted=false;
+function handlePhoto(input){
+  const file=input.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    addPhotoData=e.target.result;
+    document.getElementById('photo-preview').src=e.target.result;
+    document.getElementById('photo-preview-wrap').classList.add('show');
+  };
+  r.readAsDataURL(file);
+}
+function startScan(){ document.getElementById('scan-input').click(); }
+function handleScanPhoto(input){
+  const file=input.files[0];if(!file)return;
+  scanAborted=false;
+  const ov=document.getElementById('scan-overlay');
+  const sp=document.getElementById('scan-spinner');
+  const msg=document.getElementById('scan-msg');
+  const sub=document.getElementById('scan-sub');
+  const pi=document.getElementById('scan-preview-img');
+  sp.style.display='block';
+  msg.textContent='Reading label…';
+  sub.textContent='Claude is identifying the wine — just a moment';
+  pi.style.display='none';
+  ov.classList.add('open');
+  const r=new FileReader();
+  r.onload=async e=>{
+    addPhotoData=e.target.result;
+    pi.src=e.target.result; pi.style.display='block';
+    document.getElementById('photo-preview').src=e.target.result;
+    document.getElementById('photo-preview-wrap').classList.add('show');
+    const base64=e.target.result.split(',')[1];
+    try{
+      const d=await scanLabelWithClaude(base64,file.type||'image/jpeg');
+      if(scanAborted)return;
+      applyScannedData(d);
+      ov.classList.remove('open');
+      document.getElementById('scan-filled').classList.add('show');
+      document.getElementById('scan-filled-msg').textContent='✨ Label read — check the fields below and adjust anything.';
+      document.getElementById('add-form-scroll').scrollTop=400;
+    }catch(err){
+      if(scanAborted)return;
+      sp.style.display='none';
+      msg.textContent='Could not read label';
+      sub.textContent=(err.message||'Try a clearer photo, or fill in details manually.');
+    }
+  };
+  r.readAsDataURL(file);
+}
+async function scanLabelWithClaude(base64,mimeType){
+  const resp=await fetch('/.netlify/functions/claude',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({type:'label_scan',payload:{base64,mimeType}}),
+  });
+  if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error||'API error '+resp.status);}
+  return await resp.json();
+}
+function applyScannedData(d){
+  if(d.name)document.getElementById('f-name').value=d.name;
+  if(d.vintage)document.getElementById('f-vintage').value=d.vintage;
+  if(d.type){const ft=document.getElementById('f-type');ft.value=d.type;}
+  if(d.country)document.getElementById('f-country').value=d.country;
+  if(d.region)document.getElementById('f-region').value=d.region;
+  if(d.grape){
+    let matched=false;
+    document.querySelectorAll('.grape-chip').forEach(c=>{
+      if(c.dataset.grape&&c.dataset.grape.toLowerCase()===d.grape.toLowerCase()){pickGrape(c);matched=true;}
+    });
+    if(!matched){const oc=document.querySelector('.grape-chip[data-grape="Other"]');if(oc)pickGrape(oc);}
+  }
+}
+function cancelScan(){scanAborted=true;document.getElementById('scan-overlay').classList.remove('open');}
+
+// ══════════════════════════════════════════
+// WINE SEARCH — Claude-powered lookup
+// ══════════════════════════════════════════
+let searchTimer=null, lastSearchResult=null;
+
+function handleWineSearch(val){
+  clearTimeout(searchTimer);
+  const card=document.getElementById('wine-result-card');
+  const err=document.getElementById('wine-search-error');
+  const spinner=document.getElementById('wine-search-spinner');
+  err.classList.remove('show');
+  if(!val||val.trim().length<3){
+    card.classList.remove('show');
+    spinner.classList.remove('on');
+    return;
+  }
+  spinner.classList.add('on');
+  // Debounce — wait 600ms after user stops typing
+  searchTimer=setTimeout(()=>lookupWine(val.trim()),600);
+}
+
+async function lookupWine(query){
+  const spinner=document.getElementById('wine-search-spinner');
+  const card=document.getElementById('wine-result-card');
+  const err=document.getElementById('wine-search-error');
+  try{
+    const resp=await fetch('/.netlify/functions/claude',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({type:'wine_search',payload:{query}}),
+    });
+    if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error||'API error');}
+    const wine=await resp.json();
+    lastSearchResult=wine;
+    renderWineResult(wine);
+    card.classList.add('show');
+  }catch(e){
+    err.textContent='Could not find that wine. Try a different spelling or fill in manually below.';
+    err.classList.add('show');
+    card.classList.remove('show');
+  }finally{
+    spinner.classList.remove('on');
+  }
+}
+
+function renderWineResult(w){
+  document.getElementById('wr-name').textContent=w.name||'Unknown wine';
+  document.getElementById('wr-producer').textContent=w.producer||(w.description||'');
+  document.getElementById('wr-country').textContent=w.country||'—';
+  document.getElementById('wr-region').textContent=w.region||'—';
+  document.getElementById('wr-grape').textContent=w.grape||'—';
+  document.getElementById('wr-type').textContent={red:'Red',white:'White',rose:'Rosé',sparkling:'Sparkling',dessert:'Dessert'}[w.type]||w.type||'—';
+
+  // Type pill
+  const pillBg={red:'#f5e8ea',white:'#faeeda',rose:'#fbeaf0',sparkling:'#e2f0ed',dessert:'#eeedfe'};
+  const pillC={red:'#7c2230',white:'#633806',rose:'#72243e',sparkling:'#2a6b5a',dessert:'#3c3489'};
+  const tp=w.type||'red';
+  document.getElementById('wr-pills').innerHTML=
+    `<span class="wine-result-pill" style="background:${pillBg[tp]||'#f0ebe3'};color:${pillC[tp]||'#5c3d28'};">${{red:'Red wine',white:'White wine',rose:'Rosé',sparkling:'Sparkling',dessert:'Dessert'}[tp]||tp}</span>`+
+    (w.country?`<span class="wine-result-pill" style="background:#EAF3DE;color:#27500A;">📍 ${w.country}</span>`:'');
+
+  // Flavour tags
+  const flavHtml=(w.flavours||[]).slice(0,6).map(f=>{
+    const c=TAG_COL[f]||{bg:'#f0ebe3',c:'#5c3d28'};
+    return `<span class="tag" style="background:${c.bg};color:${c.c};">${f}</span>`;
+  }).join('');
+  document.getElementById('wr-flavours').innerHTML=flavHtml;
+}
+
+function confirmWineResult(){
+  if(!lastSearchResult)return;
+  const w=lastSearchResult;
+  // Fill all form fields
+  document.getElementById('f-name').value=w.name||'';
+  document.getElementById('f-vintage').value=w.vintage||'';
+  document.getElementById('f-type').value=w.type||'red';
+  document.getElementById('f-country').value=w.country||'';
+  document.getElementById('f-region').value=w.region||'';
+  // Match grape chip
+  if(w.grape){
+    let matched=false;
+    document.querySelectorAll('.grape-chip').forEach(c=>{
+      if(c.dataset.grape&&c.dataset.grape.toLowerCase()===w.grape.toLowerCase()){pickGrape(c);matched=true;}
+    });
+    if(!matched){const oc=document.querySelector('.grape-chip[data-grape="Other"]');if(oc)pickGrape(oc);}
+  }
+  // Apply flavours and pairings
+  activeFlavours=new Set(w.flavours||[]);
+  activeFoods=new Set(w.pairings||[]);
+  // Re-render suggested tags
+  document.getElementById('no-flavour-msg').style.display='none';
+  document.getElementById('no-food-msg').style.display='none';
+  document.getElementById('suggest-banner').classList.add('show');
+  document.getElementById('suggest-grape-name').textContent=w.grape||'this wine';
+  document.getElementById('flavour-suggested').innerHTML=(w.flavours||[]).map(f=>{
+    const c=TAG_COL[f]||{bg:'#f0ebe3',c:'#5c3d28'};
+    return `<span class="ftag on" data-label="${f}" style="background:${c.bg};color:${c.c};border-color:${c.c}40;" onclick="toggleFtag(this,'flavour')">${f}</span>`;
+  }).join('');
+  document.getElementById('food-suggest-banner').classList.add('show');
+  document.getElementById('food-suggest-grape').textContent=w.grape||'this wine';
+  document.getElementById('food-suggested').innerHTML=(w.pairings||[]).map(f=>`<span class="ftag on" data-label="${f}" style="background:${FOOD_COL.bg};color:${FOOD_COL.c};border-color:${FOOD_COL.c}40;" onclick="toggleFtag(this,'food')">${f}</span>`).join('');
+  // Hide search card, scroll to form
+  document.getElementById('wine-result-card').classList.remove('show');
+  document.getElementById('wine-search-input').value='';
+  showToast('Wine details filled in ✦ Review and save');
+  setTimeout(()=>document.getElementById('add-form-scroll').scrollTo({top:300,behavior:'smooth'}),200);
+}
+
+function editWineResult(){
+  // Pre-fill form and let user edit — same as confirm but scroll to form
+  confirmWineResult();
+}
+
+function clearWineSearch(){
+  document.getElementById('wine-search-input').value='';
+  document.getElementById('wine-result-card').classList.remove('show');
+  document.getElementById('wine-search-error').classList.remove('show');
+  lastSearchResult=null;
+  document.getElementById('wine-search-input').focus();
+}
+function pickGrape(el){
+  document.querySelectorAll('.grape-chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');selectedGrape=el.dataset.grape;
+  document.getElementById('no-flavour-msg').style.display='none';
+  activeFlavours=new Set();
+  const fl=GRAPE_FLAVOURS[selectedGrape]||[];
+  fl.forEach(f=>activeFlavours.add(f.l));
+  document.getElementById('suggest-grape-name').textContent=selectedGrape;
+  document.getElementById('suggest-banner').classList.add('show');
+  document.getElementById('flavour-suggested').innerHTML=fl.map(f=>`<span class="ftag on" data-label="${f.l}" style="background:${f.bg};color:${f.c};border-color:${f.c}40;" onclick="toggleFtag(this,'flavour')">${f.l}</span>`).join('');
+  if(allFlavOpen)renderAllFlavours();
+  document.getElementById('no-food-msg').style.display='none';
+  activeFoods=new Set();
+  const fd=GRAPE_FOOD[selectedGrape]||[];
+  fd.forEach(f=>activeFoods.add(f));
+  document.getElementById('food-suggest-grape').textContent=selectedGrape;
+  document.getElementById('food-suggest-banner').classList.add('show');
+  document.getElementById('food-suggested').innerHTML=fd.map(f=>`<span class="ftag on" data-label="${f}" style="background:${FOOD_COL.bg};color:${FOOD_COL.c};border-color:${FOOD_COL.c}40;" onclick="toggleFtag(this,'food')">${f}</span>`).join('');
+  if(allFoodOpen)renderAllFood();
+}
+function toggleFtag(el,type){
+  el.classList.toggle('on');el.classList.toggle('dim');
+  const set=type==='food'?activeFoods:activeFlavours;
+  const label=el.dataset.label;
+  set.has(label)?set.delete(label):set.add(label);
+}
+function toggleAllFlavours(){
+  allFlavOpen=!allFlavOpen;
+  const p=document.getElementById('all-flavours'),b=document.getElementById('collapse-flavours');
+  if(allFlavOpen){renderAllFlavours();p.classList.add('open');b.classList.add('show');document.getElementById('more-icon').textContent='−';document.getElementById('more-txt').textContent='Hide extra flavours';}
+  else{p.classList.remove('open');b.classList.remove('show');document.getElementById('more-icon').textContent='＋';document.getElementById('more-txt').textContent='Add more flavours';}
+}
+function renderAllFlavours(){
+  document.getElementById('all-flavours').innerHTML=ALL_FLAVOURS.map(g=>`<div class="fg-name">${g.g}</div><div class="ftags-wrap" style="padding:0 0 4px;">${g.tags.map(f=>`<span class="ftag ${activeFlavours.has(f.l)?'on':''}" data-label="${f.l}" style="background:${f.bg};color:${f.c};border-color:${f.c}40;" onclick="toggleFtag(this,'flavour')">${f.l}</span>`).join('')}</div>`).join('');
+}
+function toggleAllFood(){
+  allFoodOpen=!allFoodOpen;
+  const p=document.getElementById('all-food'),b=document.getElementById('collapse-food');
+  if(allFoodOpen){renderAllFood();p.classList.add('open');b.classList.add('show');document.getElementById('food-more-icon').textContent='−';document.getElementById('food-more-txt').textContent='Hide pairings';}
+  else{p.classList.remove('open');b.classList.remove('show');document.getElementById('food-more-icon').textContent='＋';document.getElementById('food-more-txt').textContent='Add more pairings';}
+}
+function renderAllFood(){
+  document.getElementById('all-food').innerHTML=ALL_FOOD.map(g=>`<div class="fg-name">${g.g}</div><div class="ftags-wrap" style="padding:0 0 4px;">${g.tags.map(f=>`<span class="ftag ${activeFoods.has(f)?'on':''}" data-label="${f}" style="background:${FOOD_COL.bg};color:${FOOD_COL.c};border-color:${FOOD_COL.c}40;" onclick="toggleFtag(this,'food')">${f}</span>`).join('')}</div>`).join('');
+}
+function buildAddStars(){
+  const row=document.getElementById('star-row-add');row.innerHTML='';
+  for(let i=1;i<=5;i++){const w=document.createElement('div');w.className='star-wrap';w.dataset.state='empty';w.innerHTML='<span class="s-empty">★</span><span class="s-full">★</span><span class="s-half">★</span>';w.addEventListener('click',()=>handleAddStar(i));row.appendChild(w);}
+  updateAddStars();
+}
+function handleAddStar(i){if(addRating===i)addRating=i-0.5;else if(addRating===i-0.5)addRating=i-1;else addRating=i;updateAddStars();}
+function updateAddStars(){
+  document.querySelectorAll('#star-row-add .star-wrap').forEach((w,idx)=>{const n=idx+1;w.dataset.state=addRating>=n?'full':addRating>=n-0.5?'half':'empty';});
+  document.getElementById('rating-lbl-add').textContent=addRating>0?`${addRating} — ${RATING_LABELS[addRating]}`:'Tap a star to rate';
+}
+async function saveWine(){
+  const name=document.getElementById('f-name').value.trim();
+  if(!name){document.getElementById('f-name').focus();showToast('Please enter a wine name');return;}
+  const btn=document.querySelector('#s-add .save-btn');
+  if(btn){btn.disabled=true;btn.innerHTML='<span>⏳</span> Saving…';}
+  try{
+    const wine=await dbSaveWine({
+      name, producer:name,
+      vintage:document.getElementById('f-vintage').value||null,
+      type:document.getElementById('f-type').value||'red',
+      country:document.getElementById('f-country').value.trim(),
+      region:document.getElementById('f-region').value.trim(),
+      price:parseFloat(document.getElementById('f-price').value)||null,
+      qty:addQty, grape:selectedGrape,
+      flavours:[...activeFlavours], pairings:[...activeFoods],
+      rating:addRating,
+      notes:document.getElementById('f-notes').value.trim(),
+      photo:addPhotoData||null,
+    });
+    wines.unshift(wine);
+    showToast('🍾 '+name+' added to your cellar!');
+    goBack();renderCellar();
+  }catch(e){
+    showToast('Error saving wine — please try again');
+    console.error(e);
+  }finally{
+    if(btn){btn.disabled=false;btn.innerHTML='<span>🍾</span> Save to my cellar';}
+  }
+}
+
+// ══════════════════════════════════════════
+// SCREEN 3 — BOTTLE DETAIL
+// ══════════════════════════════════════════
+let currentDetailId=null,tastingRating=0,tastingMode='quick';
+
+function renderDetail(id){
+  const w=wines.find(x=>x.id===id);if(!w)return;
+  document.getElementById('d-type-badge').textContent=TYPE_LABEL[w.type]||'Wine';
+  document.getElementById('d-type-badge').className='type-badge '+(TYPE_BADGE[w.type]||'badge-red');
+  document.getElementById('d-name').textContent=w.name;
+  document.getElementById('d-producer').textContent=[w.producer,w.region,w.country].filter(Boolean).join(' · ');
+  document.getElementById('d-vintage').textContent=w.vintage||'NV';
+  renderDetailStars(w.rating||0);
+  document.getElementById('d-rating-lbl').textContent=w.rating>0?`${w.rating} · ${RATING_LABELS[w.rating]||''}`:'Not yet rated';
+  const img=document.getElementById('detail-label-img'),ph=document.getElementById('detail-label-ph');
+  if(w.photo&&w.photo.startsWith('data')){img.src=w.photo;img.style.display='block';ph.style.display='none';}
+  else{img.style.display='none';ph.style.display='flex';}
+  const qty=w.qty||0;
+  const qn=document.getElementById('d-qty-num');qn.textContent=qty;qn.style.color=qty<=1?'var(--wine)':'var(--ink)';
+  const lw=document.getElementById('low-stock-warn');
+  if(qty<=2&&qty>0){lw.classList.add('show');document.getElementById('low-stock-n').textContent=qty;}else lw.classList.remove('show');
+  document.getElementById('d-grape').textContent=w.grape||'—';
+  document.getElementById('d-country').textContent=w.country||'—';
+  document.getElementById('d-region').textContent=w.region||'—';
+  document.getElementById('d-vintage2').textContent=w.vintage||'NV';
+  document.getElementById('d-price').textContent=w.price?'RM '+w.price.toLocaleString():'—';
+  document.getElementById('d-added').textContent=w.added?new Date(w.added).toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'}):'—';
+  const fw=document.getElementById('d-flavours');
+  fw.innerHTML=(w.flavours&&w.flavours.length)?w.flavours.map(f=>tagHtml(f)).join(''):'<span style="font-size:13px;color:var(--ink4);font-style:italic;">None recorded</span>';
+  const pw=document.getElementById('d-pairings');
+  pw.innerHTML=(w.pairings&&w.pairings.length)?w.pairings.map(p=>`<span class="tag" style="background:${FOOD_COL.bg};color:${FOOD_COL.c};">${p}</span>`).join(''):'<span style="font-size:13px;color:var(--ink4);font-style:italic;">None recorded</span>';
+  document.getElementById('d-notes-wrap').innerHTML=w.notes?`<div class="notes-display">"${w.notes}"</div>`:'<div class="notes-empty">No notes yet.</div>';
+  document.getElementById('t-date').value=new Date().toISOString().split('T')[0];
+  ['t-note','t-occasion','t-with','t-food'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  tastingRating=0;buildTastingStars();setLogMode('quick');
+  document.getElementById('delete-modal-sub').innerHTML='This will permanently remove <strong>'+w.name+'</strong>.';
+  document.getElementById('delete-confirm-btn').onclick=()=>confirmDelete(id);
+  renderTastingHistory(id);
+  document.getElementById('detail-scroll').scrollTop=0;
+}
+function renderDetailStars(rating){
+  const wrap=document.getElementById('d-stars-wrap');wrap.innerHTML='';
+  for(let i=1;i<=5;i++){const u=document.createElement('div');u.className='hstar';const bg=document.createElement('span');bg.className='hs-bg';bg.textContent='★';const fill=document.createElement('span');if(rating>=i){fill.className='hs-fill';fill.textContent='★';}else if(rating>=i-0.5){fill.className='hs-half';fill.textContent='★';}u.appendChild(bg);u.appendChild(fill);wrap.appendChild(u);}
+}
+function detailChangeQty(delta){
+  const w=wines.find(x=>x.id===currentDetailId);if(!w)return;
+  const nq=Math.max(0,w.qty+delta);
+  if(nq===0){openDeleteModal();return;}
+  w.qty=nq;dbUpdateWineQty(id,nq,false);
+  const qn=document.getElementById('d-qty-num');qn.textContent=nq;qn.style.color=nq<=1?'var(--wine)':'var(--ink)';
+  qn.style.transform=delta>0?'scale(1.15)':'scale(0.9)';setTimeout(()=>qn.style.transform='scale(1)',160);
+  const lw=document.getElementById('low-stock-warn');
+  if(nq<=2){lw.classList.add('show');document.getElementById('low-stock-n').textContent=nq;}else lw.classList.remove('show');
+}
+function shareWine(){
+  const w=wines.find(x=>x.id===currentDetailId);if(!w)return;
+  const text='🍷 '+w.name+(w.vintage?' ('+w.vintage+')':'')+'\n'+(w.region?w.region+', ':'')+(w.country||'')+'\nRating: '+(w.rating||'unrated')+'/5\nFrom My Cellar';
+  if(navigator.share){navigator.share({title:w.name,text}).catch(()=>{});}
+  else if(navigator.clipboard){navigator.clipboard.writeText(text).then(()=>showToast('Copied to clipboard!'));}
+  else showToast('Share not supported on this device');
+}
+function setLogMode(mode){
+  tastingMode=mode;
+  document.getElementById('log-quick-btn').classList.toggle('on',mode==='quick');
+  document.getElementById('log-full-btn').classList.toggle('on',mode==='full');
+  ['t-occasion-wrap','t-with-wrap','t-food-wrap'].forEach(id=>document.getElementById(id).style.display=mode==='full'?'flex':'none');
+}
+function buildTastingStars(){
+  const row=document.getElementById('star-row-tasting');row.innerHTML='';
+  for(let i=1;i<=5;i++){const w=document.createElement('div');w.className='star-wrap';w.dataset.state='empty';w.innerHTML='<span class="s-empty">★</span><span class="s-full">★</span><span class="s-half">★</span>';w.addEventListener('click',()=>{if(tastingRating===i)tastingRating=i-0.5;else if(tastingRating===i-0.5)tastingRating=i-1;else tastingRating=i;updateTastingStars();});row.appendChild(w);}
+  updateTastingStars();
+}
+function updateTastingStars(){document.querySelectorAll('#star-row-tasting .star-wrap').forEach((w,idx)=>{const n=idx+1;w.dataset.state=tastingRating>=n?'full':tastingRating>=n-0.5?'half':'empty';});}
+async function saveTasting(){
+  const date=document.getElementById('t-date').value;
+  if(!date){showToast('Please select a date');return;}
+  const entry={id:Date.now(),wineId:currentDetailId,date,mode:tastingMode,occasion:tastingMode==='full'?document.getElementById('t-occasion').value.trim():'',with:tastingMode==='full'?document.getElementById('t-with').value.trim():'',food:tastingMode==='full'?document.getElementById('t-food').value.trim():'',note:document.getElementById('t-note').value.trim(),rating:tastingRating};
+  try{
+    const saved=await dbSaveTasting(entry);
+    tastings.push(saved);
+    const w=wines.find(x=>x.id===currentDetailId);
+    if(w&&w.qty>0){w.qty--;if(w.qty===0)w.consumed=true;dbUpdateWineQty(w.id,w.qty,w.consumed);}
+    showToast('Tasting logged! 🍷');
+    renderDetail(currentDetailId);
+  }catch(e){showToast('Error saving tasting');console.error(e);}
+}
+function renderTastingHistory(wineId){
+  const list=document.getElementById('tasting-history-list');
+  const wt=tastings.filter(t=>t.wineId===wineId).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(!wt.length){list.innerHTML='<div style="font-size:13px;color:var(--ink4);font-style:italic;padding:4px 0 12px;">No tastings logged yet.</div>';return;}
+  list.innerHTML=wt.map(t=>`<div class="tlog-card"><div class="tlog-header"><div class="tlog-date">📅 ${new Date(t.date).toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'})}</div><span class="tlog-mode ${t.mode==='quick'?'mode-quick':'mode-full'}">${t.mode==='quick'?'Quick sip':'Full tasting'}</span></div><div class="tlog-body"><div class="tlog-row"><span class="tlog-key">Occasion</span><span class="tlog-val ${!t.occasion?'empty':''}">${t.occasion||'—'}</span></div><div class="tlog-row"><span class="tlog-key">Shared with</span><span class="tlog-val ${!t.with?'empty':''}">${t.with||'—'}</span></div><div class="tlog-row"><span class="tlog-key">Paired with</span><span class="tlog-val ${!t.food?'empty':''}">${t.food||'—'}</span></div><div class="tlog-row"><span class="tlog-key">Rating</span><span class="tlog-stars">${t.rating>0?'★'.repeat(Math.floor(t.rating))+'☆'.repeat(5-Math.floor(t.rating)):'—'}</span></div>${t.note?'<div class="tlog-note">"'+t.note+'"</div>':''}</div></div>`).join('');
+}
+function openDeleteModal(){document.getElementById('delete-modal').classList.add('open');}
+function closeDeleteModal(){document.getElementById('delete-modal').classList.remove('open');}
+async function confirmDelete(id){
+  try{
+    await dbDeleteWine(id);
+    wines=wines.filter(x=>x.id!==id);
+    tastings=tastings.filter(t=>t.wineId!==id);
+    closeDeleteModal();showToast('Wine removed');goBack();renderCellar();
+  }catch(e){showToast('Error removing wine');console.error(e);}
+}
+function handleDetailPhoto(input){
+  const file=input.files[0];if(!file)return;
+  const r=new FileReader();r.onload=e=>{
+    const w=wines.find(x=>x.id===currentDetailId);if(!w)return;
+    w.photo=e.target.result;
+    dbUpdateWinePhoto(w.id,e.target.result);
+    const img=document.getElementById('detail-label-img');
+    img.src=e.target.result;img.style.display='block';
+    document.getElementById('detail-label-ph').style.display='none';
+    showToast('Photo saved!');
+  };r.readAsDataURL(file);
+}
+
+// ══════════════════════════════════════════
+// SCREEN 4 — TONIGHT'S PICK
+// ══════════════════════════════════════════
+const MOOD_MAP={"Fruity":["Red berries","Dark berries","Black cherry","Stone fruit","Citrus","Tropical","Apple & pear","Dried fruit","Jammy"],"Crisp & fresh":["Crisp & clean","Zesty","Fresh & bright","Light-bodied","Grassy","Sea breeze","Herbaceous","Mineral"],"Bold & full":["Full-bodied","Tannic","Velvety","Silky","Jammy"],"Earthy":["Mushroom","Forest floor","Mineral","Herbaceous","Leather"],"Floral":["Rose petal","Violet","Jasmine","Lavender","Orange blossom","Honeysuckle"],"Smoky":["Smoky","Toasty","Charcoal","Meaty","Tobacco","Toasty oak"],"Sweet & rich":["Honey","Caramel","Chocolate","Coffee","Butterscotch","Cream","Toffee","Molasses"],"Spiced":["Black pepper","Cinnamon","Clove","Cedar","Nutmeg","Vanilla"],"Light":["Light-bodied","Fresh & bright","Crisp & clean","Zesty"],"Bubbly":["Bubbly","Crisp & clean","Apple & pear","Cream","Mineral"]};
+const MOOD_EMOJI={"Fruity":"🍒","Crisp & fresh":"🍋","Bold & full":"💪","Earthy":"🍄","Floral":"🌸","Smoky":"🔥","Sweet & rich":"🍫","Spiced":"🌶","Light":"🪶","Bubbly":"✨"};
+const FOOD_EMOJI={"Steak":"🥩","Lamb":"🍖","Seafood":"🦞","Sushi":"🍣","Pasta":"🍝","Pizza":"🍕","Cheese":"🧀","Charcuterie":"🥓","Dessert":"🍰","Chocolate":"🍫","Dark chocolate":"🍫","Just sipping":"🛋️","BBQ":"🔥","Salads":"🥗","Vegetarian":"🥦","Oysters":"🦪","Goat cheese":"🧀","Picnic":"🧺","Celebrations":"🥳","Tapas":"🫙","Light pasta":"🍝","Pork":"🍖","Chicken":"🍗","Salmon":"🐟","Spicy food":"🌶","Fruit tart":"🥧","Blue cheese":"🧀","Mushroom dishes":"🍄","Risotto":"🍚","Duck":"🍗"};
+const OCC_EMOJI={"Casual night":"😌","Romantic":"❤️","Celebration":"🥳","Dinner party":"🥘","Unwinding":"🛁","As a gift":"🎁"};
+const OCC_TYPE={"Casual night":["white","red","rose"],"Romantic":["red","sparkling","rose"],"Celebration":["sparkling","white","rose"],"Dinner party":["red","white","sparkling"],"Unwinding":["white","red","rose","dessert"],"As a gift":["red","sparkling"]};
+const FLOAT_ANIMS=['float0','float1','float2','float3','float4','float5'];
+
+function buildMoods(){
+  const score={};
+  wines.filter(w=>!w.consumed&&w.qty>0).forEach(w=>{Object.entries(MOOD_MAP).forEach(([mood,tags])=>{const hits=(w.flavours||[]).filter(f=>tags.includes(f)).length;if(hits>0)score[mood]=(score[mood]||0)+w.qty;});});
+  return score;
+}
+function buildFoods(){
+  const score={};
+  wines.filter(w=>!w.consumed&&w.qty>0).forEach(w=>{(w.pairings||[]).forEach(p=>{score[p]=(score[p]||0)+w.qty;});});
+  return score;
+}
+function scoreToSize(s,min,max){const MIN=72,MAX=108;if(max===min)return(MIN+MAX)/2;return Math.round(MIN+((s-min)/(max-min))*(MAX-MIN));}
+function packBubbles(sizes,W,H){
+  const pad=10,positions=[],MAX_T=400;
+  sizes.forEach(sz=>{const r=sz/2;let placed=false;for(let t=0;t<MAX_T;t++){const x=pad+r+Math.random()*(W-sz-pad*2),y=pad+r+Math.random()*(H-sz-pad*2);let ok=true;for(const p of positions){if(Math.hypot(x-p.cx,y-p.cy)<r+p.r+8){ok=false;break;}}if(ok){positions.push({x:x-r,y:y-r,cx:x,cy:y,r,sz});placed=true;break;}}if(!placed){const r2=sz/2;positions.push({x:pad,y:pad+positions.length*(sz+8),cx:pad+r2,cy:pad+r2+positions.length*(sz+8),r:r2,sz});}});
+  return positions;
+}
+function attachFloat(el,i){const a=FLOAT_ANIMS[i%FLOAT_ANIMS.length],dur=(4+Math.random()*4).toFixed(1),delay=(-(Math.random()*6)).toFixed(1);el.style.animation=`${a} ${dur}s ${delay}s ease-in-out infinite`;}
+
+const TONIGHT_STEPS=[
+  {id:'mood',q:"What's your <em>mood</em> tonight?",hint:"Flavours from your actual cellar",multi:true,buildData:buildMoods,getEmoji:k=>MOOD_EMOJI[k]||'🍷'},
+  {id:'food',q:"What are you <em>eating</em>?",hint:"Pairings your wines actually suggest",multi:true,buildData:buildFoods,getEmoji:k=>FOOD_EMOJI[k]||'🍽️'},
+  {id:'occasion',q:"What's the <em>occasion</em>?",hint:"Pick one — or skip",multi:false,buildData:()=>({'Casual night':1,'Romantic':1,'Celebration':1,'Dinner party':1,'Unwinding':1,'As a gift':1}),getEmoji:k=>OCC_EMOJI[k]||'🎉'},
+];
+let tStep=0,tSel={mood:[],food:[],occasion:[]};
+
+function tonightRenderStep(){tStep=0;tSel={mood:[],food:[],occasion:[]};document.getElementById('g2').classList.remove('on');document.getElementById('g3').classList.remove('on');renderTonightStep();}
+function renderTonightStep(){
+  const cfg=TONIGHT_STEPS[tStep];
+  document.getElementById('step-q').innerHTML=cfg.q;
+  document.getElementById('step-hint').textContent=cfg.hint;
+  document.getElementById('step-progress').innerHTML=TONIGHT_STEPS.map((_,i)=>`<div class="sdot ${i<tStep?'done':i===tStep?'active':'idle'}"></div>`).join('')+`<span class="step-lbl">Step ${tStep+1} of ${TONIGHT_STEPS.length}</span>`;
+  document.getElementById('g2').classList.toggle('on',tStep>=1);
+  document.getElementById('g3').classList.toggle('on',tStep>=2);
+  const canvas=document.getElementById('bubble-canvas');canvas.innerHTML='';
+  const scoreMap=cfg.buildData();
+  const keys=Object.keys(scoreMap).sort((a,b)=>scoreMap[b]-scoreMap[a]);
+  if(!keys.length){canvas.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;padding:24px;text-align:center;"><div style="font-size:44px;opacity:0.2;">🍾</div><div style="font-family:var(--serif);font-size:20px;color:rgba(255,255,255,0.4);">Your cellar is empty</div><div style="font-size:12px;color:var(--ink3);">Add wines and they\'ll appear here.</div></div>';updateTonightBtn();return;}
+  const W=canvas.offsetWidth||380,H=canvas.offsetHeight||290;
+  const scores=keys.map(k=>scoreMap[k]),minS=Math.min(...scores),maxS=Math.max(...scores);
+  const positions=packBubbles(keys.map(k=>scoreToSize(scoreMap[k],minS,maxS)),W,H);
+  keys.forEach((key,i)=>{
+    const pos=positions[i],sz=pos.sz,isOn=(tSel[cfg.id]||[]).includes(key);
+    const el=document.createElement('div');el.className='bubble'+(isOn?' on':'');
+    el.style.cssText=`width:${sz}px;height:${sz}px;left:${pos.x}px;top:${pos.y}px;animation-name:popIn;animation-duration:0.4s;animation-delay:${i*0.055}s;animation-fill-mode:both;animation-timing-function:cubic-bezier(0.34,1.3,0.64,1);`;
+    const eSz=Math.round(sz*0.30),lSz=Math.max(9,Math.round(sz*0.115));
+    el.innerHTML=`<span class="b-emoji" style="font-size:${eSz}px;">${cfg.getEmoji(key)}</span><span class="b-label" style="font-size:${lSz}px;padding:0 6px;">${key}</span>`;
+    el.addEventListener('animationend',()=>{if(!el.classList.contains('on'))attachFloat(el,i);},{once:true});
+    el.addEventListener('click',()=>{
+      const group=cfg.id;
+      if(!cfg.multi){tSel[group]=[key];canvas.querySelectorAll('.bubble').forEach((b,bi)=>{b.classList.remove('on');attachFloat(b,bi);});el.classList.add('on');el.style.animation='none';}
+      else{const idx=tSel[group].indexOf(key);if(idx>-1){tSel[group].splice(idx,1);el.classList.remove('on');attachFloat(el,i);}else{tSel[group].push(key);el.classList.add('on');el.style.animation='none';}}
+      updateTonightBtn();
+    });
+    canvas.appendChild(el);
+  });
+  updateTonightBtn();
+}
+function updateTonightBtn(){
+  const cfg=TONIGHT_STEPS[tStep],n=(tSel[cfg.id]||[]).length,isLast=tStep===TONIGHT_STEPS.length-1;
+  const btn=document.getElementById('tonight-next-btn'),lbl=document.getElementById('tonight-next-lbl'),cnt=document.getElementById('tonight-next-count');
+  if(n>0){btn.className='next-btn next-ready';lbl.textContent=isLast?'Find my bottle 🌙':'Next →';cnt.textContent=n>1?n+' selected':'';}
+  else{btn.className='next-btn next-idle';lbl.textContent='Tap a bubble';cnt.textContent='';}
+}
+function tonightNextStep(){if(tStep<TONIGHT_STEPS.length-1){tStep++;renderTonightStep();}else showTonightResults();}
+function showTonightResults(){
+  const results=scoreTonightWines();
+  document.getElementById('results-overlay').classList.add('open');
+  document.getElementById('res-title').textContent=results.length>0?results.length+' match'+(results.length!==1?'es':''):'No matches';
+  const allSel=[...(tSel.mood||[]),...(tSel.food||[]),...(tSel.occasion||[])];
+  document.getElementById('res-pills').innerHTML=allSel.length?allSel.map(s=>'<span class="rpill">'+s+'</span>').join(''):'<span class="rpill" style="opacity:0.4;">No filters</span>';
+  const scroll=document.getElementById('res-scroll');
+  if(!results.length){scroll.innerHTML='<div class="no-res"><div class="no-res-i">🔍</div><div class="no-res-t">Nothing matches</div><div class="no-res-s">Try fewer filters or a different mood.</div><button onclick="closeTonightResults()" style="margin-top:14px;padding:11px 24px;border-radius:20px;background:var(--amber);border:none;font-family:var(--sans);font-size:13px;color:#fff;cursor:pointer;">← Start over</button></div>';return;}
+  scroll.innerHTML=results.map((r,i)=>{
+    const {wine,mFlavours,mFoods,score}=r;
+    const bar=TYPE_BAR[wine.type]||'bar-red';
+    let bCls,bTxt;if(i===0){bCls='bb';bTxt='⭐ Best match';}else if(score>=7){bCls='bg';bTxt='✓ Great match';}else{bCls='bm';bTxt='· Good match';}
+    const tagH=(wine.flavours||[]).slice(0,3).map(f=>{const c=TAG_COL[f]||{bg:'#f0ebe3',c:'#5c3d28'};return`<span class="rtag ${mFlavours.includes(f)?'lit':''}" style="background:${c.bg};color:${c.c};">${f}</span>`;}).join('')+mFoods.slice(0,2).map(f=>`<span class="rtag lit" style="background:#EAF3DE;color:#27500A;">🍽 ${f}</span>`).join('');
+    return`<div class="rcard" onclick="closeTonightResults();openDetailScreen(${wine.id})"><div class="rcard-bar ${bar}"></div><div class="rcard-inner"><span class="rcard-badge ${bCls}">${bTxt}</span><div class="rcard-name">${wine.name}</div><div class="rcard-meta">${[wine.grape,wine.region,wine.country].filter(Boolean).join(' · ')}${wine.vintage?' · '+wine.vintage:''}</div><div class="rcard-foot"><div class="rcard-tags">${tagH}</div><div style="display:flex;align-items:center;gap:8px;flex-shrink:0;"><div class="qty-ring"><div class="qty-ring-n">${wine.qty}</div><div class="qty-ring-l">left</div></div><div class="rcard-aux"><div class="rcard-stars">${'★'.repeat(Math.floor(wine.rating||0))}${'☆'.repeat(5-Math.floor(wine.rating||0))}</div>${wine.price?'<div class="rcard-price">RM '+wine.price.toLocaleString()+'</div>':''}</div></div></div></div></div>`;
+  }).join('');
+  const consumed=wines.filter(w=>w.consumed||w.qty===0);
+  if(consumed.length){scroll.innerHTML+='<div class="csep">Loved before · now consumed</div>'+consumed.map(w=>`<div class="ccard"><div><div class="ccard-name">${w.name}</div><div class="ccard-meta">${w.type} · ${'★'.repeat(Math.floor(w.rating||0))}</div></div><button class="restock-pill" onclick="event.stopPropagation();showToast('${w.name.replace(/'/g,"\\'")} noted for restock 🛒')">+ Restock</button></div>`).join('');}
+  scroll.innerHTML+='<div class="scroll-end"></div>';
+}
+function scoreTonightWines(){
+  return wines.filter(w=>!w.consumed&&w.qty>0).map(wine=>{
+    let score=0,mFlavours=[],mFoods=[];
+    (tSel.mood||[]).forEach(mood=>{(MOOD_MAP[mood]||[]).forEach(tag=>{if((wine.flavours||[]).includes(tag)){if(!mFlavours.includes(tag))mFlavours.push(tag);score+=3;}});});
+    (tSel.food||[]).forEach(food=>{if((wine.pairings||[]).some(p=>p.toLowerCase().includes(food.toLowerCase())||food.toLowerCase().includes(p.toLowerCase()))){if(!mFoods.includes(food))mFoods.push(food);score+=4;}});
+    (tSel.occasion||[]).forEach(occ=>{if((OCC_TYPE[occ]||[]).includes(wine.type))score+=3;});
+    score+=(wine.rating||0)*0.4;
+    if(Object.values(tSel).flat().length===0)score=wine.rating||1;
+    return{wine,score,mFlavours,mFoods};
+  }).filter(r=>r.score>0).sort((a,b)=>b.score-a.score);
+}
+function closeTonightResults(){document.getElementById('results-overlay').classList.remove('open');tStep=0;tSel={mood:[],food:[],occasion:[]};renderTonightStep();}
+
+// ══════════════════════════════════════════
+// INIT — Supabase auth bootstrap
+// ══════════════════════════════════════════
+initTheme();
+buildAddStars();
+
+// Show loading overlay while checking session
+async function bootApp(){
+  // Wait for DOM to be fully ready
+  await new Promise(r=>setTimeout(r,0));
+
+  const loader=document.getElementById('db-loading');
+  const hideLoader=()=>{
+    if(!loader)return;
+    loader.classList.add('done');
+    setTimeout(()=>{if(loader)loader.style.display='none';},500);
+  };
+  const showLoader=()=>{
+    if(!loader)return;
+    loader.style.display='flex';
+    loader.classList.remove('done');
+  };
+
+  // Handle token in URL hash (email confirmation redirect from Supabase)
+  if(window.location.hash&&window.location.hash.includes('access_token')){
+    await sb.auth.getSession();
+    window.history.replaceState(null,'',window.location.pathname);
+  }
+
+  // Listen for auth state changes
+  sb.auth.onAuthStateChange(async(event,session)=>{
+    console.log('Auth event:',event);
+    if(session&&session.user){
+      currentUser=session.user;
+      updateUserUI(currentUser);
+      if(event==='SIGNED_IN'||event==='INITIAL_SESSION'||event==='TOKEN_REFRESHED'||event==='USER_UPDATED'){
+        showLoader();
+        try{
+          await loadAllData();
+        }catch(e){
+          console.error('loadAllData error:',e);
+        }
+        hideLoader();
+        screenStack=['s-cellar'];
+        showScreen('s-cellar',false);
+        renderCellar();
+      }
+    } else {
+      hideLoader();
+      screenStack=['s-login'];
+      showScreen('s-login',false);
+    }
+  });
+
+  // Check for existing session on first load
+  try{
+    const{data:{session},error}=await sb.auth.getSession();
+    if(error)throw error;
+    if(!session&&!(window.location.hash&&window.location.hash.includes('access_token'))){
+      hideLoader();
+      showScreen('s-login',false);
+    }
+  }catch(e){
+    console.error('getSession error:',e);
+    hideLoader();
+    showScreen('s-login',false);
+  }
+}
+
+bootApp();
+</script>
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{});}</script>
+</body>
+</html>
