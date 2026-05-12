@@ -2127,36 +2127,24 @@ async function bootApp(){
     window.history.replaceState(null,'',window.location.pathname);
   }
 
-  // Listen for auth state changes
-  sb.auth.onAuthStateChange(async(event,session)=>{
-    console.log('Auth event:',event);
-    if(session&&session.user){
-      currentUser=session.user;
-      updateUserUI(currentUser);
-      if(event==='SIGNED_IN'||event==='INITIAL_SESSION'||event==='TOKEN_REFRESHED'||event==='USER_UPDATED'){
-        showLoader();
-        try{
-          await loadAllData();
-        }catch(e){
-          console.error('loadAllData error:',e);
-        }
-        hideLoader();
-        screenStack=['s-cellar'];
-        showScreen('s-cellar',false);
-        renderCellar();
-      }
-    } else {
-      hideLoader();
-      screenStack=['s-login'];
-      showScreen('s-login',false);
-    }
-  });
-
   // Check for existing session on first load
   try{
     const{data:{session},error}=await sb.auth.getSession();
     if(error)throw error;
-    if(!session&&!(window.location.hash&&window.location.hash.includes('access_token'))){
+    if(session&&session.user){
+      // Already logged in — load data and go to cellar
+      currentUser=session.user;
+      updateUserUI(currentUser);
+      showLoader();
+      try{ await loadAllData(); }catch(e){ console.error('loadAllData error:',e); }
+      hideLoader();
+      screenStack=['s-cellar'];
+      showScreen('s-cellar',false);
+      renderCellar();
+    } else if(window.location.hash&&window.location.hash.includes('access_token')){
+      // Coming from email confirmation link — wait for onAuthStateChange
+    } else {
+      // No session — show login
       hideLoader();
       showScreen('s-login',false);
     }
@@ -2165,6 +2153,26 @@ async function bootApp(){
     hideLoader();
     showScreen('s-login',false);
   }
+
+  // Listen for auth state changes (login, magic link, token refresh)
+  sb.auth.onAuthStateChange(async(event,session)=>{
+    console.log('Auth event:',event);
+    if(event==='SIGNED_IN'&&session&&session.user){
+      currentUser=session.user;
+      updateUserUI(currentUser);
+      showLoader();
+      try{ await loadAllData(); }catch(e){ console.error('loadAllData error:',e); }
+      hideLoader();
+      screenStack=['s-cellar'];
+      showScreen('s-cellar',false);
+      renderCellar();
+    } else if(event==='SIGNED_OUT'){
+      wines=[];tastings=[];currentUser=null;
+      hideLoader();
+      screenStack=['s-login'];
+      showScreen('s-login',false);
+    }
+  });
 }
 
 bootApp();
