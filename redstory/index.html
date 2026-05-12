@@ -1573,9 +1573,6 @@ function resetAddForm(){
   ['f-name','f-vintage','f-country','f-region','f-price','f-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   const ft=document.getElementById('f-type');if(ft)ft.value='';
   document.getElementById('add-qty-display').textContent='1';
-  document.getElementById('photo-preview').style.display='none';
-  document.getElementById('photo-icon').style.display='block';
-  document.getElementById('photo-txt').style.display='block';
   document.querySelectorAll('.grape-chip').forEach(c=>c.classList.remove('on'));
   document.getElementById('flavour-suggested').innerHTML='';
   document.getElementById('food-suggested').innerHTML='';
@@ -2158,14 +2155,22 @@ async function bootApp(){
   sb.auth.onAuthStateChange(async(event,session)=>{
     console.log('Auth event:',event);
     if(event==='SIGNED_IN'&&session&&session.user){
+      // Only navigate on actual sign in, not token refresh
       currentUser=session.user;
       updateUserUI(currentUser);
-      showLoader();
-      try{ await loadAllData(); }catch(e){ console.error('loadAllData error:',e); }
-      hideLoader();
-      screenStack=['s-cellar'];
-      showScreen('s-cellar',false);
-      renderCellar();
+      const alreadyInApp=screenStack.includes('s-cellar');
+      if(!alreadyInApp){
+        showLoader();
+        try{ await loadAllData(); }catch(e){ console.error('loadAllData error:',e); }
+        hideLoader();
+        screenStack=['s-cellar'];
+        showScreen('s-cellar',false);
+        renderCellar();
+      }
+    } else if(event==='TOKEN_REFRESHED'&&session&&session.user){
+      // Just update the user, don't navigate or reload
+      currentUser=session.user;
+      updateUserUI(currentUser);
     } else if(event==='SIGNED_OUT'){
       wines=[];tastings=[];currentUser=null;
       hideLoader();
